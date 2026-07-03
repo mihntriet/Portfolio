@@ -3,9 +3,6 @@ import { Terminal, ChevronDown, GitBranch, Hammer, FlaskConical, Rocket, Scan } 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { myProfileData } from '../data/profile'
 
-/* ============================================================
-   TYPEWRITER EFFECT FOR "DevOps Engineer"
-   ============================================================ */
 const TYPEWRITER_TEXT = 'DevOps Engineer'
 const TYPING_SPEED = 100
 const DELETE_SPEED = 60
@@ -39,9 +36,6 @@ function useTypewriter(text) {
   return displayed
 }
 
-/* ============================================================
-   CI/CD PIPELINE NODE
-   ============================================================ */
 const PIPELINE_NODES = [
   { id: 'source', label: 'Source', icon: GitBranch, color: '#10B981' },
   { id: 'build', label: 'Build', icon: Hammer, color: '#3b82f6' },
@@ -310,25 +304,20 @@ function CICDPipeline() {
   )
 }
 
-/* ============================================================
-   FUTURISTIC AVATAR — angular frame, glow border, scanlines
-   ============================================================ */
 function FuturisticAvatar() {
   const [hovered, setHovered] = useState(false)
 
   return (
     <motion.div
-      className="relative flex items-center justify-center"
+      className="relative flex items-center justify-center w-[270px] h-[270px] md:w-[350px] md:h-[350px]"
       initial={{ opacity: 0, scale: 0.85 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 0.5, duration: 0.8, ease: 'easeOut' }}
     >
       {/* ── Outer radar ring (slow pulse) ── */}
       <motion.div
-        className="absolute rounded-full pointer-events-none"
+        className="absolute rounded-full pointer-events-none w-[240px] h-[240px] md:w-[330px] md:h-[330px]"
         style={{
-          width: '330px',
-          height: '330px',
           border: '1px solid rgba(16,185,129,0.15)',
         }}
         animate={{ scale: [1, 1.06, 1], opacity: [0.4, 0.8, 0.4] }}
@@ -337,10 +326,8 @@ function FuturisticAvatar() {
 
       {/* ── Radar sweep arc (rotating) ── */}
       <motion.div
-        className="absolute pointer-events-none"
+        className="absolute pointer-events-none w-[220px] h-[220px] md:w-[310px] md:h-[310px]"
         style={{
-          width: '310px',
-          height: '310px',
           borderRadius: '50%',
           background:
             'conic-gradient(from 0deg, transparent 75%, rgba(16,185,129,0.45) 90%, rgba(0,240,255,0.2) 100%)',
@@ -351,10 +338,8 @@ function FuturisticAvatar() {
 
       {/* ── Second sweep ring (offset) ── */}
       <motion.div
-        className="absolute pointer-events-none"
+        className="absolute pointer-events-none w-[220px] h-[220px] md:w-[310px] md:h-[310px]"
         style={{
-          width: '310px',
-          height: '310px',
           borderRadius: '50%',
           border: '1px solid rgba(0,240,255,0.25)',
         }}
@@ -366,22 +351,19 @@ function FuturisticAvatar() {
       {[0, 90, 180, 270].map((rot) => (
         <motion.div
           key={rot}
-          className="absolute pointer-events-none"
+          className="absolute pointer-events-none w-[190px] h-[190px] md:w-[260px] md:h-[260px]"
           style={{
-            width: '260px',
-            height: '260px',
             rotate: `${rot}deg`,
           }}
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 2, repeat: Infinity, delay: rot / 360 }}
         >
           <div
+            className="w-[18px] h-[18px] md:w-[24px] md:h-[24px]"
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
-              width: '24px',
-              height: '24px',
               borderTop: '2px solid #10B981',
               borderLeft: '2px solid #10B981',
               boxShadow: '0 0 10px rgba(16,185,129,0.7)',
@@ -392,10 +374,8 @@ function FuturisticAvatar() {
 
       {/* ── Main image container ── */}
       <motion.div
-        className="relative overflow-hidden cursor-pointer"
+        className="relative overflow-hidden cursor-pointer w-[170px] h-[170px] md:w-[240px] md:h-[240px]"
         style={{
-          width: '240px',
-          height: '240px',
           clipPath: 'polygon(12px 0%, calc(100% - 12px) 0%, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0% calc(100% - 12px), 0% 12px)',
           border: '1.5px solid rgba(16,185,129,0.5)',
           boxShadow: hovered
@@ -510,9 +490,6 @@ function FuturisticAvatar() {
   )
 }
 
-/* ============================================================
-   HERO SECTION
-   ============================================================ */
 export default function HeroSection() {
   const typedText = useTypewriter(TYPEWRITER_TEXT)
 
@@ -523,6 +500,7 @@ export default function HeroSection() {
 
           {/* ===== LEFT SIDE — Info ===== */}
           <motion.div
+            className="order-1 lg:order-none"
             initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -636,12 +614,14 @@ export default function HeroSection() {
           </motion.div>
 
           {/* ===== CENTER — Futuristic Avatar ===== */}
-          <div className="hidden lg:flex items-center justify-center py-10">
+          <div className="flex items-center justify-center py-6 lg:py-10 order-2 lg:order-none">
             <FuturisticAvatar />
           </div>
 
           {/* ===== RIGHT SIDE — CI/CD Pipeline ===== */}
-          <CICDPipeline />
+          <div className="order-3 lg:order-none w-full">
+            <CICDPipeline />
+          </div>
         </div>
 
         {/* Scroll indicator */}

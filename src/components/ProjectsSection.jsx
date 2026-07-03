@@ -7,10 +7,6 @@ import {
 import { useState, useRef } from 'react'
 import { myProfileData } from '../data/profile'
 
-/* ============================================================
-   ARCHITECTURE DATA
-   Each project has nodes (icons) and connections between them.
-   ============================================================ */
 const PROJECTS = [
   {
     id: 'wedding-deployment',
@@ -152,9 +148,6 @@ const PROJECTS = [
   },
 ]
 
-/* ============================================================
-   PULSE RING — expanding circles for active nodes
-   ============================================================ */
 function PulseRing({ color, delay = 0 }) {
   return (
     <>
@@ -249,9 +242,6 @@ function ArchNode({ node, accent, index }) {
   )
 }
 
-/* ============================================================
-   CONNECTION LINE with animated data flow dot
-   ============================================================ */
 function ConnectionLine({ from, to, accent, index, nodes }) {
   const fromNode = nodes.find((n) => n.id === from)
   const toNode = nodes.find((n) => n.id === to)
@@ -309,9 +299,6 @@ function ConnectionLine({ from, to, accent, index, nodes }) {
   )
 }
 
-/* ============================================================
-   ARCHITECTURE DIAGRAM — expanded view
-   ============================================================ */
 function ArchitectureDiagram({ project }) {
   return (
     <motion.div
@@ -355,60 +342,62 @@ function ArchitectureDiagram({ project }) {
         </motion.div>
 
         {/* Architecture diagram */}
-        <motion.div
-          className="relative w-full rounded-xl overflow-hidden"
-          style={{
-            height: '340px',
-            background: 'linear-gradient(145deg, rgba(11,15,25,0.95), rgba(17,24,39,0.9))',
-            border: `1px solid ${project.accent}20`,
-          }}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.25, duration: 0.5 }}
-        >
-          {/* Grid background */}
-          <div
-            className="absolute inset-0 pointer-events-none"
+        <div className="w-full overflow-x-auto scrollbar-thin rounded-xl pb-2">
+          <motion.div
+            className="relative rounded-xl overflow-hidden min-w-[620px] lg:min-w-0"
             style={{
-              backgroundImage: `linear-gradient(to right, ${project.accent}06 1px, transparent 1px), linear-gradient(to bottom, ${project.accent}06 1px, transparent 1px)`,
-              backgroundSize: '30px 30px',
+              height: '340px',
+              background: 'linear-gradient(145deg, rgba(11,15,25,0.95), rgba(17,24,39,0.9))',
+              border: `1px solid ${project.accent}20`,
             }}
-          />
-
-          {/* Diagram title */}
-          <div className="absolute top-3 left-4 flex items-center gap-2 z-20">
-            <span
-              className="text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded border"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.25, duration: 0.5 }}
+          >
+            {/* Grid background */}
+            <div
+              className="absolute inset-0 pointer-events-none"
               style={{
-                color: project.accent,
-                borderColor: `${project.accent}30`,
-                background: `${project.accent}10`,
+                backgroundImage: `linear-gradient(to right, ${project.accent}06 1px, transparent 1px), linear-gradient(to bottom, ${project.accent}06 1px, transparent 1px)`,
+                backgroundSize: '30px 30px',
               }}
-            >
-              ARCHITECTURE
-            </span>
-            <span className="text-[9px] text-text-muted">
-              {project.nodes.filter((n) => n.active).length}/{project.nodes.length} nodes active
-            </span>
-          </div>
-
-          {/* Connection lines */}
-          {project.connections.map((conn, i) => (
-            <ConnectionLine
-              key={`${conn.from}-${conn.to}`}
-              from={conn.from}
-              to={conn.to}
-              accent={project.accent}
-              index={i}
-              nodes={project.nodes}
             />
-          ))}
 
-          {/* Nodes */}
-          {project.nodes.map((node, i) => (
-            <ArchNode key={node.id} node={node} accent={project.accent} index={i} />
-          ))}
-        </motion.div>
+            {/* Diagram title */}
+            <div className="absolute top-3 left-4 flex items-center gap-2 z-20">
+              <span
+                className="text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded border"
+                style={{
+                  color: project.accent,
+                  borderColor: `${project.accent}30`,
+                  background: `${project.accent}10`,
+                }}
+              >
+                ARCHITECTURE
+              </span>
+              <span className="text-[9px] text-text-muted">
+                {project.nodes.filter((n) => n.active).length}/{project.nodes.length} nodes active
+              </span>
+            </div>
+
+            {/* Connection lines */}
+            {project.connections.map((conn, i) => (
+              <ConnectionLine
+                key={`${conn.from}-${conn.to}`}
+                from={conn.from}
+                to={conn.to}
+                accent={project.accent}
+                index={i}
+                nodes={project.nodes}
+              />
+            ))}
+
+            {/* Nodes */}
+            {project.nodes.map((node, i) => (
+              <ArchNode key={node.id} node={node} accent={project.accent} index={i} />
+            ))}
+          </motion.div>
+        </div>
 
         {/* GitHub link */}
         {project.githubRepo && (
@@ -447,9 +436,6 @@ function ArchitectureDiagram({ project }) {
   )
 }
 
-/* ============================================================
-   PROJECT CARD — collapsed/expanded
-   ============================================================ */
 function ProjectCard({ project, isExpanded, onToggle, index }) {
   const Icon = project.nodes[0]?.icon || Server
 
@@ -612,9 +598,6 @@ function ProjectCard({ project, isExpanded, onToggle, index }) {
   )
 }
 
-/* ============================================================
-   PROJECTS SECTION
-   ============================================================ */
 export default function ProjectsSection() {
   const [expandedId, setExpandedId] = useState(null)
 

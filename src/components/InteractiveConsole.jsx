@@ -133,7 +133,7 @@ function TypedOutput({ lines, onComplete }) {
   return (
     <>
       {lines.slice(0, visibleCount).map((line, i) => (
-        <div key={i} className="leading-relaxed" style={{ minHeight: '1.25em' }}>
+        <div key={i} className="leading-relaxed whitespace-pre overflow-x-auto scrollbar-none" style={{ minHeight: '1.25em' }}>
           <span style={{ color: line.color || '#e2e8f0' }}>{line.text}</span>
         </div>
       ))}
@@ -144,7 +144,7 @@ function TypedOutput({ lines, onComplete }) {
 /* ============================================================
    MAIN COMPONENT
    ============================================================ */
-export default function InteractiveConsole() {
+export default function InteractiveConsole({ hideHeader = false }) {
   const [history, setHistory] = useState([
     {
       type: 'system',
@@ -234,6 +234,151 @@ export default function InteractiveConsole() {
     }
   }, [input, isProcessing, historyIndex, cmdHistory, handleCommand])
 
+  const terminalWindow = (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ duration: 0.7 }}
+      className="relative rounded-xl overflow-hidden"
+      style={{
+        background: 'linear-gradient(145deg, rgba(11,15,25,0.98), rgba(17,24,39,0.95))',
+        border: '1px solid rgba(0,240,255,0.15)',
+        boxShadow: '0 0 40px rgba(0,240,255,0.05), 0 20px 60px rgba(0,0,0,0.4)',
+      }}
+      onClick={focusInput}
+    >
+      {/* Title bar */}
+      <div
+        className="flex items-center gap-3 px-4 py-2.5 border-b"
+        style={{
+          borderColor: 'rgba(0,240,255,0.1)',
+          background: 'rgba(11,15,25,0.8)',
+        }}
+      >
+        <div className="flex gap-1.5">
+          <span className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors cursor-pointer" />
+          <span className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 transition-colors cursor-pointer" />
+          <span className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 transition-colors cursor-pointer" />
+        </div>
+        <div className="flex items-center gap-2 ml-2">
+          <Terminal className="w-3.5 h-3.5 text-neon-cyan" />
+          <span className="text-[10px] text-text-muted tracking-wider">
+            dev@portfolio:~
+          </span>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <span className="status-dot" />
+          <span className="text-[9px] text-neon-green tracking-wider">CONNECTED</span>
+        </div>
+      </div>
+
+      {/* Terminal body */}
+      <div
+        ref={scrollRef}
+        className="p-4 sm:p-5 font-mono text-xs sm:text-sm overflow-y-auto notranslate w-full overflow-x-auto"
+        translate="no"
+        style={{
+          height: '420px',
+          scrollBehavior: 'smooth',
+        }}
+      >
+        {history.map((entry, i) => {
+          if (entry.type === 'input') {
+            return (
+              <div key={i} className="flex items-center gap-2 mb-1">
+                <span className="text-neon-green select-none">❯</span>
+                <span className="text-text-primary">{entry.text}</span>
+              </div>
+            )
+          }
+
+          if (entry.type === 'system') {
+            return (
+              <div key={i} className="mb-4 p-4 rounded border border-neon-cyan/30 bg-neon-cyan/5 shadow-[0_0_15px_rgba(0,240,255,0.05)] relative overflow-hidden max-w-lg font-mono">
+                <div className="absolute top-0 left-0 w-2.5 h-2.5 border-t-2 border-l-2 border-neon-cyan" />
+                <div className="absolute top-0 right-0 w-2.5 h-2.5 border-t-2 border-r-2 border-neon-cyan" />
+                <div className="absolute bottom-0 left-0 w-2.5 h-2.5 border-b-2 border-l-2 border-neon-cyan" />
+                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 border-b-2 border-r-2 border-neon-cyan" />
+                <div className="text-neon-cyan font-bold mb-1 text-xs">
+                  {entry.title}
+                </div>
+                <div className="text-text-muted text-[11px]">
+                  {entry.subtitle}
+                </div>
+              </div>
+            )
+          }
+
+          if (entry.type === 'output' || entry.type === 'error') {
+            return (
+              <div key={entry.id || i} className="mb-3">
+                <TypedOutput
+                  lines={entry.lines}
+                  onComplete={() => setIsProcessing(false)}
+                />
+              </div>
+            )
+          }
+
+          return null
+        })}
+
+        {/* Input line */}
+        <div className="flex items-center gap-2 mt-1">
+          <span className="text-neon-green select-none">❯</span>
+          <div className="flex-1 relative">
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={isProcessing}
+              className="w-full bg-transparent text-text-primary outline-none caret-transparent font-mono text-xs sm:text-sm"
+              spellCheck={false}
+              autoComplete="off"
+              aria-label="Terminal command input"
+            />
+            {/* Custom blinking cursor */}
+            <motion.span
+              className="absolute top-0 inline-block w-[7px] sm:w-[8px] h-[1.1em] rounded-sm"
+              style={{
+                left: `${input.length * 0.602}em`,
+                background: '#00f0ff',
+                boxShadow: '0 0 6px rgba(0,240,255,0.7), 0 0 12px rgba(0,240,255,0.3)',
+              }}
+              animate={{ opacity: [1, 0, 1] }}
+              transition={{ duration: 0.9, repeat: Infinity, ease: 'steps(2)' }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div
+        className="flex items-center justify-between px-4 py-2 border-t text-[9px] text-text-muted"
+        style={{
+          borderColor: 'rgba(0,240,255,0.08)',
+          background: 'rgba(11,15,25,0.6)',
+        }}
+      >
+        <span>
+          bash — {history.filter((e) => e.type === 'input').length} commands executed
+        </span>
+        <div className="flex items-center gap-4">
+          <span>UTF-8</span>
+          <span>LF</span>
+          <span className="text-neon-cyan">zsh 5.9</span>
+        </div>
+      </div>
+    </motion.div>
+  )
+
+  if (hideHeader) {
+    return terminalWindow
+  }
+
   return (
     <section id="console" className="relative">
       <div className="section-container">
@@ -257,145 +402,7 @@ export default function InteractiveConsole() {
           </p>
         </motion.div>
 
-        {/* Terminal window */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.7 }}
-          className="relative rounded-xl overflow-hidden"
-          style={{
-            background: 'linear-gradient(145deg, rgba(11,15,25,0.98), rgba(17,24,39,0.95))',
-            border: '1px solid rgba(0,240,255,0.15)',
-            boxShadow: '0 0 40px rgba(0,240,255,0.05), 0 20px 60px rgba(0,0,0,0.4)',
-          }}
-          onClick={focusInput}
-        >
-          {/* Title bar */}
-          <div
-            className="flex items-center gap-3 px-4 py-2.5 border-b"
-            style={{
-              borderColor: 'rgba(0,240,255,0.1)',
-              background: 'rgba(11,15,25,0.8)',
-            }}
-          >
-            <div className="flex gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors cursor-pointer" />
-              <span className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 transition-colors cursor-pointer" />
-              <span className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 transition-colors cursor-pointer" />
-            </div>
-            <div className="flex items-center gap-2 ml-2">
-              <Terminal className="w-3.5 h-3.5 text-neon-cyan" />
-              <span className="text-[10px] text-text-muted tracking-wider">
-                dev@portfolio:~
-              </span>
-            </div>
-            <div className="ml-auto flex items-center gap-2">
-              <span className="status-dot" />
-              <span className="text-[9px] text-neon-green tracking-wider">CONNECTED</span>
-            </div>
-          </div>
-
-          {/* Terminal body */}
-          <div
-            ref={scrollRef}
-            className="p-4 sm:p-5 font-mono text-xs sm:text-sm overflow-y-auto notranslate"
-            translate="no"
-            style={{
-              height: '420px',
-              scrollBehavior: 'smooth',
-            }}
-          >
-            {history.map((entry, i) => {
-              if (entry.type === 'input') {
-                return (
-                  <div key={i} className="flex items-center gap-2 mb-1">
-                    <span className="text-neon-green select-none">❯</span>
-                    <span className="text-text-primary">{entry.text}</span>
-                  </div>
-                )
-              }
-
-              if (entry.type === 'system') {
-                return (
-                  <div key={i} className="mb-4 p-4 rounded border border-neon-cyan/30 bg-neon-cyan/5 shadow-[0_0_15px_rgba(0,240,255,0.05)] relative overflow-hidden max-w-lg font-mono">
-                    <div className="absolute top-0 left-0 w-2.5 h-2.5 border-t-2 border-l-2 border-neon-cyan" />
-                    <div className="absolute top-0 right-0 w-2.5 h-2.5 border-t-2 border-r-2 border-neon-cyan" />
-                    <div className="absolute bottom-0 left-0 w-2.5 h-2.5 border-b-2 border-l-2 border-neon-cyan" />
-                    <div className="absolute bottom-0 right-0 w-2.5 h-2.5 border-b-2 border-r-2 border-neon-cyan" />
-                    <div className="text-neon-cyan font-bold mb-1 text-xs">
-                      {entry.title}
-                    </div>
-                    <div className="text-text-muted text-[11px]">
-                      {entry.subtitle}
-                    </div>
-                  </div>
-                )
-              }
-
-              if (entry.type === 'output' || entry.type === 'error') {
-                return (
-                  <div key={entry.id || i} className="mb-3">
-                    <TypedOutput
-                      lines={entry.lines}
-                      onComplete={() => setIsProcessing(false)}
-                    />
-                  </div>
-                )
-              }
-
-              return null
-            })}
-
-            {/* Input line */}
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-neon-green select-none">❯</span>
-              <div className="flex-1 relative">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={isProcessing}
-                  className="w-full bg-transparent text-text-primary outline-none caret-transparent font-mono text-xs sm:text-sm"
-                  spellCheck={false}
-                  autoComplete="off"
-                  aria-label="Terminal command input"
-                />
-                {/* Custom blinking cursor */}
-                <motion.span
-                  className="absolute top-0 inline-block w-[7px] sm:w-[8px] h-[1.1em] rounded-sm"
-                  style={{
-                    left: `${input.length * 0.602}em`,
-                    background: '#00f0ff',
-                    boxShadow: '0 0 6px rgba(0,240,255,0.7), 0 0 12px rgba(0,240,255,0.3)',
-                  }}
-                  animate={{ opacity: [1, 0, 1] }}
-                  transition={{ duration: 0.9, repeat: Infinity, ease: 'steps(2)' }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom bar */}
-          <div
-            className="flex items-center justify-between px-4 py-2 border-t text-[9px] text-text-muted"
-            style={{
-              borderColor: 'rgba(0,240,255,0.08)',
-              background: 'rgba(11,15,25,0.6)',
-            }}
-          >
-            <span>
-              bash — {history.filter((e) => e.type === 'input').length} commands executed
-            </span>
-            <div className="flex items-center gap-4">
-              <span>UTF-8</span>
-              <span>LF</span>
-              <span className="text-neon-cyan">zsh 5.9</span>
-            </div>
-          </div>
-        </motion.div>
+        {terminalWindow}
       </div>
     </section>
   )

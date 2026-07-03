@@ -212,9 +212,19 @@ function TiltCard({ children, className = '', accent }) {
   const cardRef = useRef(null)
   const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 })
   const [isHovered, setIsHovered] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const handleMouseMove = useCallback((e) => {
-    if (!cardRef.current) return
+    if (isMobile || !cardRef.current) return
     const rect = cardRef.current.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
@@ -225,30 +235,34 @@ function TiltCard({ children, className = '', accent }) {
     const rotateY = ((x - centerX) / centerX) * 12
 
     setTilt({ rotateX, rotateY })
-  }, [])
+  }, [isMobile])
 
   const handleMouseLeave = useCallback(() => {
+    if (isMobile) return
     setTilt({ rotateX: 0, rotateY: 0 })
     setIsHovered(false)
-  }, [])
+  }, [isMobile])
 
   return (
     <motion.div
       ref={cardRef}
       className={`relative ${className}`}
-      style={{ perspective: '800px' }}
+      style={{ perspective: isMobile ? 'none' : '800px' }}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
+      onMouseEnter={() => !isMobile && setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
+      onTouchStart={() => isMobile && setIsHovered(true)}
+      onTouchEnd={() => isMobile && setTimeout(() => setIsHovered(false), 800)}
+      whileTap={isMobile ? { scale: 0.98 } : {}}
     >
       <motion.div
         className="w-full h-full"
         animate={{
-          rotateX: tilt.rotateX,
-          rotateY: tilt.rotateY,
+          rotateX: isMobile ? 0 : tilt.rotateX,
+          rotateY: isMobile ? 0 : tilt.rotateY,
         }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        style={{ transformStyle: 'preserve-3d' }}
+        style={{ transformStyle: isMobile ? 'flat' : 'preserve-3d' }}
       >
         {/* Card body */}
         <div
@@ -281,7 +295,7 @@ function TiltCard({ children, className = '', accent }) {
           />
 
           {/* Spotlight on hover */}
-          {isHovered && (
+          {isHovered && !isMobile && (
             <div
               className="absolute inset-0 pointer-events-none"
               style={{

@@ -5,7 +5,6 @@ import AboutSection from './components/AboutSection'
 import SkillsSection from './components/SkillsSection'
 import ProjectsSection from './components/ProjectsSection'
 import ContactSection from './components/ContactSection'
-import InteractiveConsole from './components/InteractiveConsole'
 import Footer from './components/Footer'
 
 export default function App() {
@@ -24,7 +23,6 @@ export default function App() {
         <SkillsSection />
         <ProjectsSection />
         <ContactSection />
-        <InteractiveConsole />
       </main>
 
       {/* Footer */}
