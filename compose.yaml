@@ -1,0 +1,15 @@
+services:
+  portfolio:
+    container_name: my-portfolio-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    networks:
+      - portfolio-net
+
+networks:
+  portfolio-net:
+    driver: bridge
