@@ -46,9 +46,9 @@ export const myProfileData = {
         },
         {
             title: "Interactive DevOps Portfolio",
-            description: "A modern portfolio showcasing system engineering skills, packaged with Docker and Docker Compose, featuring complex layout micro-interactions and an interactive Linux terminal emulator.",
+            description: "Engineered a responsive portfolio using React and Framer Motion, featuring custom pipeline animations and an interactive Linux terminal emulator.",
             techStack: ["React", "Vite", "Tailwind CSS", "Docker", "Docker Compose", "Nginx", "Framer Motion", "EmailJS API"],
-            achievements: "Containerized the application utilizing a Multi-stage build process with Node and Nginx, orchestrated local deployment with Docker Compose, and configured Nginx fallbacks for routing.",
+            achievements: "Containerized the application via a Multi-stage Docker build (Node & Nginx) to optimize the production image size, orchestrated the infrastructure using compose.yaml, configured Nginx routing fallbacks to handle single-page reloads, and integrated EmailJS API for real-time contact form signaling.",
             githubRepo: "https://github.com/mihntriet/Portfolio",
         }
     ],
