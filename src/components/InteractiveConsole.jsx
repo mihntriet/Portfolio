@@ -35,7 +35,7 @@ const PROJECTS_LINES = [
   { text: '> tail -f /var/log/deployments.log', color: '#64748b' },
   { text: '', color: '' },
   ...myProfileData.projects.flatMap((p, idx) => {
-    const colors = ['#a855f7', '#3b82f6', '#10B981', '#ff6b35']
+    const colors = ['#a855f7', '#3b82f6', '#10B981', '#ff6b35', '#00f0ff']
     const color = colors[idx % colors.length]
     return [
       { text: `[DEPLOY] ✓ ${p.title}`, color },
@@ -45,7 +45,7 @@ const PROJECTS_LINES = [
       { text: '', color: '' }
     ]
   }),
-  { text: '[INFO] All systems operational. 4 projects deployed.', color: '#39ff14' },
+  { text: '[INFO] All systems operational. 5 projects deployed.', color: '#39ff14' },
 ]
 
 const getProgressBar = (level) => {

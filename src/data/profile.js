@@ -43,6 +43,13 @@ export const myProfileData = {
             techStack: ["C++", "C#", "OOP Design", "Team Collaboration", "Git Workflow"],
             achievements: "Collaborated as a team to build an internal game engine: clearly separated modules and used a professional Git workflow to merge code without conflicts.",
             githubRepo: "https://github.com/dmtriet11",
+        },
+        {
+            title: "Cyber-DevOps Interactive Portfolio",
+            description: "A futuristic cyberpunk portfolio showcasing professional skills, featuring complex micro-interactions, layout animations, and an interactive Linux terminal.",
+            techStack: ["React", "Vite", "Tailwind CSS", "Framer Motion", "EmailJS API", "Vercel"],
+            achievements: "Engineered a custom radar transmitter contact form and terminal simulator. Integrated environment variables and fully automated CI/CD pipeline via GitHub Vercel hook.",
+            githubRepo: "https://github.com/mihntriet/Portfolio",
         }
     ],
 

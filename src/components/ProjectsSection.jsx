@@ -124,6 +124,32 @@ const PROJECTS = [
       { from: 'render', to: 'audio' },
     ],
   },
+  {
+    id: 'interactive-portfolio',
+    title: myProfileData.projects[4].title,
+    subtitle: 'Futuristic Frontend & Cloud Hosting',
+    accent: '#00f0ff',
+    description: `${myProfileData.projects[4].description} ${myProfileData.projects[4].achievements}`,
+    tags: myProfileData.projects[4].techStack,
+    githubRepo: myProfileData.projects[4].githubRepo,
+    nodes: [
+      { id: 'dev', label: 'Local Dev (Git)', icon: GitBranch, x: 8, y: 30, active: true },
+      { id: 'github', label: 'GitHub Webhook', icon: Workflow, x: 28, y: 30, active: true },
+      { id: 'vercel', label: 'Vercel Deployment', icon: Server, x: 52, y: 12, active: true },
+      { id: 'emailjs', label: 'EmailJS Gateway', icon: Shield, x: 52, y: 48, active: true },
+      { id: 'cdn', label: 'Global Edge CDN', icon: Cloud, x: 75, y: 12, active: true },
+      { id: 'mailbox', label: 'Gmail Inbox', icon: Database, x: 75, y: 48, active: true },
+      { id: 'client', label: 'Client Browser', icon: Monitor, x: 92, y: 30, active: true },
+    ],
+    connections: [
+      { from: 'dev', to: 'github' },
+      { from: 'github', to: 'vercel' },
+      { from: 'vercel', to: 'cdn' },
+      { from: 'cdn', to: 'client' },
+      { from: 'client', to: 'emailjs' },
+      { from: 'emailjs', to: 'mailbox' },
+    ],
+  },
 ]
 
 /* ============================================================
