@@ -303,7 +303,10 @@ export default function ContactSection() {
                   exit={{ opacity: 0 }}
                   className="space-y-4 flex flex-col justify-between flex-1"
                 >
-                  <div className="bg-cyber-bg/90 border border-cyber-border p-4 rounded-lg font-mono text-[11px] leading-relaxed flex-1 flex flex-col justify-end space-y-1.5 overflow-hidden min-h-[220px]">
+                  <div 
+                    className="bg-cyber-bg/90 border border-cyber-border p-4 rounded-lg font-mono text-[11px] leading-relaxed flex-1 flex flex-col justify-end space-y-1.5 overflow-hidden min-h-[220px] notranslate"
+                    translate="no"
+                  >
                     <div className="flex items-center gap-2 text-neon-cyan border-b border-cyber-border pb-1.5 mb-2">
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       <span>Transmitter scanning & processing...</span>

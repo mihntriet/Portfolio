@@ -299,7 +299,8 @@ export default function InteractiveConsole() {
           {/* Terminal body */}
           <div
             ref={scrollRef}
-            className="p-4 sm:p-5 font-mono text-xs sm:text-sm overflow-y-auto"
+            className="p-4 sm:p-5 font-mono text-xs sm:text-sm overflow-y-auto notranslate"
+            translate="no"
             style={{
               height: '420px',
               scrollBehavior: 'smooth',

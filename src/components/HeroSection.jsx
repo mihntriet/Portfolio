@@ -554,7 +554,8 @@ export default function HeroSection() {
                 <br />
                 {/* Typewriter with neon green glow */}
                 <span
-                  className="inline-block min-h-[1.2em]"
+                  className="inline-block min-h-[1.2em] notranslate"
+                  translate="no"
                   style={{
                     color: '#10B981',
                     textShadow:
