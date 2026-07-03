@@ -45,10 +45,10 @@ export const myProfileData = {
             githubRepo: "https://github.com/dmtriet11",
         },
         {
-            title: "Cyber-DevOps Interactive Portfolio",
-            description: "A futuristic cyberpunk portfolio showcasing professional skills, featuring complex micro-interactions, layout animations, and an interactive Linux terminal.",
-            techStack: ["React", "Vite", "Tailwind CSS", "Framer Motion", "EmailJS API", "Vercel"],
-            achievements: "Engineered a custom radar transmitter contact form and terminal simulator. Integrated environment variables and fully automated CI/CD pipeline via GitHub Vercel hook.",
+            title: "Interactive DevOps Portfolio",
+            description: "A modern portfolio showcasing system engineering skills, packaged with Docker and Docker Compose, featuring complex layout micro-interactions and an interactive Linux terminal emulator.",
+            techStack: ["React", "Vite", "Tailwind CSS", "Docker", "Docker Compose", "Nginx", "Framer Motion", "EmailJS API"],
+            achievements: "Containerized the application utilizing a Multi-stage build process with Node and Nginx, orchestrated local deployment with Docker Compose, and configured Nginx fallbacks for routing.",
             githubRepo: "https://github.com/mihntriet/Portfolio",
         }
     ],
