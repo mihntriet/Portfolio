@@ -1,33 +1,28 @@
-# 🌐 Cyber-DevOps Interactive Portfolio
+# DevOps Interactive Portfolio
 
-Welcome to the **Cyber-DevOps Interactive Portfolio** — a premium, high-performance web dashboard showcasing DevOps pipelines, system architectures, and engineering capabilities wrapped in an interactive Cyberpunk command center aesthetic.
-
-This project is built from scratch utilizing React, Vite, Tailwind CSS, and Framer Motion, engineered to run securely and responsively on any desktop, tablet, or mobile viewport.
+Welcome to the DevOps Interactive Portfolio. This project is built utilizing React, Vite, Tailwind CSS, and Framer Motion, designed to run responsively on any desktop, tablet, or mobile viewport.
 
 ---
 
-## ⚡ Tech Stack & Architecture
+## Tech Stack & Architecture
 
-- **Frontend Core**: React 18, Vite (for ultra-fast HMR builds), Tailwind CSS (for modern utility styling).
-- **Interactive Visuals**: Framer Motion (for smooth micro-animations, slide-out drawer, and dynamic CLI logs).
-- **Communication Layer**: EmailJS REST API (dependency-free integration with secure network telemetry logging).
-- **Deployment & Hosting**: Docker Multi-stage Build & Nginx (optimized static asset hosting & routing protection).
-
----
-
-## 🚀 Key Features
-
-1. **Operations Command Center**: Features a simulated Radar Signal Transmitter panel side-by-side with an interactive Linux CLI Terminal on desktop viewports.
-2. **Interactive Architecture Canvas**: Dynamic architectural graphs showing active nodes. Fully responsive and swipeable on mobile screen views.
-3. **100% Mobile Optimized**: Automatically transforms double-column grids to vertical flex stacks on screens below `768px`. Tilt effects convert dynamically to tactile touch scales.
-4. **Translation Crash Proof**: Configured with `translate="no"` parameters to prevent external translation extensions (e.g., Google Translate) from corrupting the React virtual DOM tree.
+- Frontend: React 18, Vite, Tailwind CSS
+- Animation: Framer Motion
+- Communication: EmailJS REST API
+- Deployment: Docker & Nginx
 
 ---
 
-## 💻 Local Development & Operation
+## Key Features
 
-### Prerequisites
-Make sure you have Node.js (version 18 or above) installed on your system.
+1. Command Center: Features a simulated Radar Signal Transmitter panel side-by-side with an interactive Linux CLI Terminal on desktop viewports.
+2. Architecture Canvas: Dynamic architectural graphs showing active nodes. Fully responsive and swipeable on mobile screen views.
+3. Mobile Optimization: Automatically transforms layouts to vertical stacks on screens below 768px. Hover effects convert dynamically to touch tap actions.
+4. Translation Protection: Configured with "translate=no" parameters to prevent browser translation extensions from corrupting the React virtual DOM.
+
+---
+
+## Local Development & Operation
 
 ### 1. Install Dependencies
 ```bash
@@ -38,7 +33,7 @@ npm install
 ```bash
 npm run dev
 ```
-Open [http://localhost:5173](http://localhost:5173) in your browser to test locally.
+Open http://localhost:5173 in your browser.
 
 ### 3. Build Production Bundle
 ```bash
@@ -47,51 +42,40 @@ npm run build
 
 ---
 
-## 🐳 Docker Deployment & Containerization
+## Docker Deployment
 
-The project is packaged utilizing a **Multi-Stage Build** to minimize the final production image size and maximize performance.
+This project uses a Multi-stage Dockerfile to compile and host static files via Nginx.
 
 ### 1. Build Docker Image
-Run the build command from the root directory containing the `Dockerfile`:
 ```bash
-docker build -t cyberpunk-portfolio:v1 .
+docker build -t portfolio:v1 .
 ```
 
 ### 2. Run Docker Container
-Launch the container, mapping port `80` (internal Nginx) to port `8080` (external host):
 ```bash
-docker run -d -p 8080:80 --name my-portfolio cyberpunk-portfolio:v1
+docker run -d -p 8080:80 --name my-portfolio portfolio:v1
 ```
-Access your running deployment at: [http://localhost:8080](http://localhost:8080).
+Access at http://localhost:8080.
 
 ---
 
-## 🐙 Multi-Container Automation (Docker Compose)
+## Docker Compose Deployment
 
-For rapid operations and automation, a `compose.yaml` configuration is provided.
-
-### 1. Start the Deployment
-Build the context and start the services running in detached background mode:
+### 1. Start the System
 ```bash
 docker compose up -d --build
 ```
 
-### 2. Monitor Container Status & Logs
-```bash
-docker compose ps
-docker compose logs -f
-```
-
-### 3. Stop the Deployment
+### 2. Stop the System
 ```bash
 docker compose down
 ```
 
 ---
 
-## ⚙️ Nginx & Routing Configuration
+## Nginx Routing Configuration
 
-The deployment utilizes a custom [**`nginx.conf`**](file:///d:/24C02/Portfolio/nginx.conf) configuration to guarantee SPA routing works flawlessly without returning HTTP 404 errors on page reload (F5):
+Custom nginx.conf configuration is used to prevent React Router 404 errors when reloading the page:
 
 ```nginx
 location / {
@@ -100,4 +84,3 @@ location / {
     try_files $uri $uri/ /index.html;
 }
 ```
-This forces Nginx to fall back to the React index page if a static asset matching the URL route is not found, letting React Router handle routing seamlessly.
