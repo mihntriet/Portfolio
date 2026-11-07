@@ -6,7 +6,7 @@ This portfolio documents my current DevOps learning path and projects. I deploye
 
 - Hands-on foundation: Linux, Docker, Ansible, and AWS EC2. The Ansible playbooks and a reproducible EC2 walkthrough are in this repository.
 - Theory only: Terraform and Kubernetes. They are not presented as production experience.
-- A GitHub Actions CI workflow is configured to lint, test, build, and smoke-test the Docker image. Its first hosted run is pending a push. EC2 deployment is manual through Ansible; automated CD is not configured.
+- A GitHub Actions CI workflow runs lint, test, build, and Docker smoke checks on pushes to `main` and pull requests. The first hosted run passed the app checks and Docker build but hit a connection reset in the HTTP smoke check; the retry fix awaits a hosted run. EC2 deployment is manual through Ansible.
 - Pipeline animations, terminal output, and project architecture diagrams on the site are illustrative, not live monitoring data.
 - Only this portfolio currently has a project-specific repository link in the site. Links for other projects will be added when verified.
 
@@ -52,7 +52,7 @@ npm test
 npm run build
 ```
 
-The configured GitHub Actions workflow runs these checks on pull requests and pushes to `main`, then builds the Docker image and verifies that Nginx serves the homepage and SPA fallback. The first hosted run has not been verified. The workflow does not publish an image or deploy to a server yet.
+The GitHub Actions workflow runs these checks on pull requests and pushes to `main`, then builds the Docker image and tests that Nginx serves the homepage and SPA fallback. After the first hosted run encountered a connection reset during container startup, the smoke check was updated to retry transient failures and print container diagnostics if it still fails. The workflow does not publish an image or deploy to a server yet.
 
 ### 4. Optional contact form configuration
 
