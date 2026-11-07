@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Mail, MapPin, GitFork, Globe, Share2, Radio, Wifi, Loader2, CheckCircle2, Shield } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { Mail, MapPin, GitFork, Globe, Radio, Wifi, Loader2, CheckCircle2 } from 'lucide-react'
+import { useState } from 'react'
 import { myProfileData } from '../data/profile'
 import InteractiveConsole from './InteractiveConsole'
 
@@ -9,6 +9,12 @@ const SOCIAL_LINKS = [
   { icon: GitFork, label: 'GitHub (Projects)', href: myProfileData.personalInfo.githubAlt, color: '#a855f7' },
   { icon: Globe, label: 'LinkedIn', href: myProfileData.personalInfo.linkedin, color: '#3b82f6' },
 ]
+
+const isContactConfigured = Boolean(
+  import.meta.env.VITE_EMAILJS_SERVICE_ID &&
+  import.meta.env.VITE_EMAILJS_TEMPLATE_ID &&
+  import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+)
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
@@ -22,16 +28,15 @@ export default function ContactSection() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    if (!isContactConfigured) return
     setIsTransmitting(true)
     setTransmitLogs([])
     setIsSuccess(false)
 
     const logs = [
-      "[SYSTEM] Initializing Signal Transmitter...",
-      "[ENCRYPT] Encrypting message payloads with AES-256...",
-      "[UPLINK] Establishing connection to central server LIO_SERVER...",
-      "[ROUTING] Tunneling data packages through secure gateway...",
-      "[TRANSMIT] Transmitting secure signal burst..."
+      "[FORM] Preparing your message...",
+      "[API] Preparing an EmailJS request...",
+      "[API] Sending the request from your browser..."
     ]
 
     let currentLogIndex = 0
@@ -47,7 +52,7 @@ export default function ContactSection() {
         const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
         const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
 
-        setTransmitLogs((prev) => [...prev, "[API] Initiating EmailJS integration payload..."])
+        setTransmitLogs((prev) => [...prev, "[API] Contacting EmailJS..."])
 
         fetch("https://api.emailjs.com/api/v1.0/email/send", {
           method: "POST",
@@ -67,7 +72,7 @@ export default function ContactSection() {
         })
           .then((res) => {
             if (res.ok) {
-              setTransmitLogs((prev) => [...prev, "[SUCCESS] Central Server acknowledged signal packet."])
+              setTransmitLogs((prev) => [...prev, "[SUCCESS] EmailJS accepted the request."])
               setTimeout(() => {
                 setIsTransmitting(false)
                 setIsSuccess(true)
@@ -82,11 +87,11 @@ export default function ContactSection() {
             setTransmitLogs((prev) => [...prev, "[ERROR] Signal lost or rejected by destination hub."])
             setTimeout(() => {
               setIsTransmitting(false)
-              alert("Uplink Failure: Failed to transmit signal packet. Please try again.")
+              alert("Could not send the message. Please try again or use the email address below.")
             }, 1500)
           })
       }
-    }, 400) // 5 steps * 400ms = 2 seconds
+    }, 400)
   }
 
   const handleReset = () => {
@@ -113,7 +118,7 @@ export default function ContactSection() {
             <div className="flex-1 h-px bg-gradient-to-r from-neon-orange/30 to-transparent" />
           </div>
           <p className="text-text-secondary text-sm max-w-2xl">
-            Access operations interface. Transmit signals directly via radar uplink or execute local CLI queries.
+            Send a message through EmailJS or explore this portfolio in the simulated terminal.
           </p>
         </motion.div>
 
@@ -149,9 +154,9 @@ export default function ContactSection() {
               </div>
               <div className="mt-4 text-center">
                 <span className="text-[10px] font-bold tracking-widest text-neon-cyan uppercase">
-                  Uplink Status: Active
+                  Contact form demo
                 </span>
-                <p className="text-[9px] text-text-muted mt-1">Transmitter Ready // Frequency 2.4GHz</p>
+                <p className="text-[9px] text-text-muted mt-1">Requests are sent from your browser via EmailJS.</p>
               </div>
             </div>
 
@@ -168,10 +173,10 @@ export default function ContactSection() {
                 <div className="flex items-center gap-2">
                   <Wifi className="w-4 h-4 text-neon-cyan animate-pulse" />
                   <span className="text-xs font-bold text-text-primary uppercase tracking-wider font-mono">
-                    Signal Transmitter Console
+                    Contact Form Console
                   </span>
                 </div>
-                <span className="text-[10px] text-text-muted font-mono">SECURE SSL_V3</span>
+                <span className="text-[10px] text-text-muted font-mono">EMAILJS CLIENT API</span>
               </div>
 
               <AnimatePresence mode="wait">
@@ -238,16 +243,22 @@ export default function ContactSection() {
                     </div>
                     <motion.button
                       type="submit"
+                      disabled={!isContactConfigured}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-bold font-mono
                         bg-gradient-to-r from-neon-cyan/20 to-neon-purple/20 border border-neon-cyan/40 text-neon-cyan
                         hover:from-neon-cyan/30 hover:to-neon-purple/30 hover:shadow-[0_0_25px_rgba(0,240,255,0.15)]
-                        transition-all duration-300 cursor-pointer"
+                        transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Wifi className="w-4 h-4" />
-                      Transmit Signal
+                      Send Message
                     </motion.button>
+                    {!isContactConfigured && (
+                      <p className="text-[11px] text-text-muted">
+                        Contact form is not configured in this build. Please use the email address below.
+                      </p>
+                    )}
                   </motion.form>
                 )}
 
@@ -266,7 +277,7 @@ export default function ContactSection() {
                     >
                       <div className="flex items-center gap-2 text-neon-cyan border-b border-cyber-border pb-1.5 mb-2">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>Transmitter scanning & processing...</span>
+                        <span>Preparing contact request...</span>
                       </div>
                       <div className="flex-1 flex flex-col justify-start space-y-1 overflow-y-auto">
                         {transmitLogs.map((log, index) => (
@@ -307,10 +318,10 @@ export default function ContactSection() {
                     </div>
                     <div className="space-y-2">
                       <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider font-mono">
-                        Signal Transmitted successfully
+                        Request accepted by EmailJS
                       </h3>
                       <p className="text-xs text-neon-green font-mono bg-neon-green/5 border border-neon-green/20 rounded-lg p-4 max-w-sm mx-auto leading-relaxed">
-                        Signal Encrypted and successfully transmitted to LIO_SERVER Central Hub!
+                        EmailJS accepted the message request. Thank you for reaching out.
                       </p>
                     </div>
                     <motion.button
@@ -321,7 +332,7 @@ export default function ContactSection() {
                         hover:border-neon-cyan/40 hover:text-neon-cyan hover:shadow-[0_0_15px_rgba(0,240,255,0.1)]
                         transition-all duration-300 cursor-pointer"
                     >
-                      Reset Transmitter
+                      Send another message
                     </motion.button>
                   </motion.div>
                 )}

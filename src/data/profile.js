@@ -11,7 +11,7 @@ export const myProfileData = {
         githubAlt: "https://github.com/dmtriet11",
         linkedin: "https://linkedin.com/in/lio56",
         email: "doanminhtriet0506@gmail.com",
-        tagline: "Passionate about building automated systems, optimizing infrastructure, and designing Cloud-native architectures.",
+        tagline: "I deployed this portfolio to an Amazon Linux 2023 EC2 instance with Ansible and Docker. I am building CI experience and learning Terraform and Kubernetes step by step.",
     },
 
     // 2. Real Projects (displayed in the Interactive Architecture Diagram)
@@ -20,63 +20,56 @@ export const myProfileData = {
             title: "Wedding Invitation System Deployment",
             description: "An online wedding invitation platform featuring real-time RSVP functionality for guests.",
             techStack: ["React", "Tailwind CSS", "Firebase Firestore", "GitHub Actions", "Firebase Hosting"],
-            achievements: "Fully automated the CI/CD pipeline: tests run and deploy to Hosting automatically on every push to the main branch.",
-            githubRepo: "https://github.com/dmtriet11",
+            achievements: "An RSVP project using Firebase services. A project-specific repository and CI workflow walkthrough are still to be documented.",
+            githubRepo: null,
         },
         {
             title: "Lab OS & Network Projects",
             description: "A series of system configuration and process management assignments from the HCMUS Year 2 curriculum.",
             techStack: ["C/C++", "Linux Shell Scripting", "Docker", "Ubuntu Server"],
-            achievements: "Used Docker to containerize lab environments, allowing all team members to run code consistently without environment conflicts.",
-            githubRepo: "https://github.com/dmtriet11",
+            achievements: "Practiced Linux system administration and Docker-based lab environments. A public lab walkthrough is still to be documented.",
+            githubRepo: null,
         },
         {
             title: "Food Delivery App",
-            description: "A cross-platform mobile food ordering application. Responsible for the entire React Native frontend and managing all API endpoints with a Flask backend.",
+            description: "A cross-platform food ordering team project using React Native and a Flask API.",
             techStack: ["React Native", "Flask API", "Firebase Auth", "Firebase Firestore", "Expo"],
-            achievements: "Designed and managed the full API endpoint system: user authentication, menu management, order placement, and real-time order tracking.",
-            githubRepo: "https://github.com/dmtriet11",
+            achievements: "Contributed to the mobile frontend and API integration. A project-specific repository and contribution breakdown are still to be documented.",
+            githubRepo: null,
         },
         {
             title: "Group Desktop Game Project",
-            description: "A collaborative desktop game developed as a team project for class, built with C++/C# featuring game logic, physics, and local multiplayer.",
+            description: "A collaborative desktop game developed as a class team project with C++/C#.",
             techStack: ["C++", "C#", "OOP Design", "Team Collaboration", "Git Workflow"],
-            achievements: "Collaborated as a team to build an internal game engine: clearly separated modules and used a professional Git workflow to merge code without conflicts.",
-            githubRepo: "https://github.com/dmtriet11",
+            achievements: "Practiced modular code and team Git workflow. A project-specific repository and contribution breakdown are still to be documented.",
+            githubRepo: null,
         },
         {
             title: "Interactive DevOps Portfolio",
-            description: "I engineered a responsive Cyberpunk portfolio using React and Framer Motion, featuring custom pipeline animations and an interactive Linux terminal emulator.",
-            techStack: ["React", "Vite", "Tailwind CSS", "Docker", "Docker Compose", "Nginx", "Framer Motion", "EmailJS API"],
-            achievements: "I containerized the application via a Multi-stage Docker build (Node & Nginx) to optimize the production image size down, orchestrated the infrastructure using compose.yaml, configured Nginx routing fallbacks to handle single-page reloads, and integrated EmailJS API for real-time contact form signaling.",
+            description: "A React portfolio deployed to Amazon Linux 2023 on EC2 using Ansible, Docker, and Nginx.",
+            techStack: ["Ansible", "AWS EC2", "Docker", "Nginx", "GitHub Actions", "React", "Vite"],
+            achievements: "The Ansible playbooks install Docker, build the image on EC2, run the Nginx container, and verify HTTP. Two consecutive deployment runs reported changed=6 then changed=0, with no failures. GitHub Actions CI is configured; its first hosted run has not been verified.",
             githubRepo: "https://github.com/mihntriet/Portfolio",
         }
     ],
 
-    // 3. Skill levels for the Infrastructure Dashboard
+    // 3. Skills with explicit practice status instead of subjective percentages
     skills: {
-        linuxAutomation: [
-            { name: "Bash Scripting", level: 75 },
-            { name: "Linux System Administration", level: 70 }
+        practiced: [
+            { name: "Linux", detail: "Hands-on foundation; public lab notes pending." },
+            { name: "Docker", detail: "Multi-stage build and Compose in this repository.", href: "https://github.com/mihntriet/Portfolio" },
+            { name: "Ansible", detail: "Used bootstrap and deploy playbooks for this EC2 deployment." },
+            { name: "AWS EC2", detail: "Deployed this portfolio on Amazon Linux 2023." }
         ],
-        containers: [
-            { name: "Docker & Containerization", level: 80 },
-            { name: "Kubernetes (Basic Concepts)", level: 50 }
-        ],
-        cicd: [
-            { name: "GitHub Actions", level: 75 },
-            { name: "Git Workflow", level: 85 },
-            { name: "Jenkins", level: 20 }
-        ],
-        cloudMonitoring: [
-            { name: "Firebase Service Stack", level: 80 },
-            { name: "Vercel / Cloud Deployment", level: 85 }
+        learning: [
+            { name: "Terraform", detail: "Theory only; first AWS lab planned." },
+            { name: "Kubernetes", detail: "Theory only; first local cluster lab planned." }
         ]
     },
 
     // 4. Terminal simulator command responses
     terminalCommands: {
-        about: "Hello! I'm Doan Minh Triet, a 2nd-year IT student at HCMUS. I'm deeply focused on DevOps culture, infrastructure automation, and CI/CD Pipelines.",
+        about: "Hello! I'm Doan Minh Triet, a 2nd-year IT student at HCMUS. I deployed this portfolio to EC2 with Ansible and Docker. Terraform and Kubernetes are currently theory only.",
         contact: "You can reach me via Email: doanminhtriet0506@gmail.com or GitHub: https://github.com/mihntriet"
     }
 };

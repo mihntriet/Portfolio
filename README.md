@@ -1,12 +1,22 @@
-# DevOps Interactive Portfolio
+# DevOps Portfolio
 
-Welcome to the DevOps Interactive Portfolio. This project is built utilizing React, Vite, Tailwind CSS, and Framer Motion, designed to run responsively on any desktop, tablet, or mobile viewport.
+This portfolio documents my current DevOps learning path and projects. I deployed this repository to an Amazon Linux 2023 EC2 instance from WSL using Ansible, Docker, and Nginx.
+
+## Current status
+
+- Hands-on foundation: Linux, Docker, Ansible, and AWS EC2. The Ansible playbooks and a reproducible EC2 walkthrough are in this repository.
+- Theory only: Terraform and Kubernetes. They are not presented as production experience.
+- A GitHub Actions CI workflow is configured to lint, test, build, and smoke-test the Docker image. Its first hosted run is pending a push. EC2 deployment is manual through Ansible; automated CD is not configured.
+- Pipeline animations, terminal output, and project architecture diagrams on the site are illustrative, not live monitoring data.
+- Only this portfolio currently has a project-specific repository link in the site. Links for other projects will be added when verified.
+
+For the Windows + WSL + Amazon Linux 2023 setup, follow the [EC2 deployment guide](ansible/README.md) and read the [deployment case study](ansible/CASE_STUDY.md). The bootstrap and deployment playbooks have been run on EC2, and the portfolio was reachable through the instance's public address on port 8080.
 
 ---
 
 ## Tech Stack & Architecture
 
-- Frontend: React 18, Vite, Tailwind CSS
+- Frontend: React 19, Vite, Tailwind CSS
 - Animation: Framer Motion
 - Communication: EmailJS REST API
 - Deployment: Docker & Nginx
@@ -15,8 +25,8 @@ Welcome to the DevOps Interactive Portfolio. This project is built utilizing Rea
 
 ## Key Features
 
-1. Command Center: Features a simulated Radar Signal Transmitter panel side-by-side with an interactive Linux CLI Terminal on desktop viewports.
-2. Architecture Canvas: Dynamic architectural graphs showing active nodes. Fully responsive and swipeable on mobile screen views.
+1. Contact and terminal: EmailJS client-side contact form and a simulated terminal for browsing portfolio information.
+2. Architecture Canvas: Illustrative project diagrams. The nodes and animations are not live infrastructure telemetry.
 3. Mobile Optimization: Automatically transforms layouts to vertical stacks on screens below 768px. Hover effects convert dynamically to touch tap actions.
 4. Translation Protection: Configured with "translate=no" parameters to prevent browser translation extensions from corrupting the React virtual DOM.
 
@@ -26,7 +36,7 @@ Welcome to the DevOps Interactive Portfolio. This project is built utilizing Rea
 
 ### 1. Install Dependencies
 ```bash
-npm install
+npm ci
 ```
 
 ### 2. Run Development Server
@@ -35,10 +45,37 @@ npm run dev
 ```
 Open http://localhost:5173 in your browser.
 
-### 3. Build Production Bundle
+### 3. Run the same checks as CI
+```bash
+npm run lint
+npm test
+npm run build
+```
+
+The configured GitHub Actions workflow runs these checks on pull requests and pushes to `main`, then builds the Docker image and verifies that Nginx serves the homepage and SPA fallback. The first hosted run has not been verified. The workflow does not publish an image or deploy to a server yet.
+
+### 4. Optional contact form configuration
+
+Copy `.env.example` to `.env` and fill in the three EmailJS values before running Vite locally. These `VITE_*` values are embedded in browser code; never put secrets in them. Without configuration, the form is disabled and the email address remains visible. The current Docker build excludes `.env`, so its contact form is disabled by default.
+
+### 5. Build Production Bundle
 ```bash
 npm run build
 ```
+
+---
+
+## EC2 deployment with Ansible
+
+The control node is Ubuntu in WSL on Windows; the managed node is Amazon Linux 2023 on EC2. The [bootstrap playbook](ansible/bootstrap-amazon-linux.yml) installs and starts Docker. The [deployment playbook](ansible/deploy.yml) copies the build inputs, builds the image on EC2, starts an Nginx container on port 8080, and checks the local HTTP response. The [inventory template](ansible/inventory.example.ini) shows the SSH settings; the real inventory and private key stay outside Git.
+
+```bash
+ansible -i ansible/inventory.ini portfolio -m ansible.builtin.ping
+ansible-playbook -i ansible/inventory.ini ansible/bootstrap-amazon-linux.yml
+ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
+```
+
+The deployment was run twice: the first run reported `changed=6`, and the second reported `changed=0`, with no failed or unreachable hosts. After pinning a compatible `community.docker` version and updating the site, another unchanged run also reported `changed=0` without warnings. The playbook's HTTP check passed. This is an HTTP lab endpoint; HTTPS and automated delivery are future phases.
 
 ---
 
@@ -75,7 +112,7 @@ docker compose down
 
 ## Nginx Routing Configuration
 
-Custom nginx.conf configuration is used to prevent React Router 404 errors when reloading the page:
+The Nginx configuration falls back to `index.html` for SPA page reloads:
 
 ```nginx
 location / {

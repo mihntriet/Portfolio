@@ -1,8 +1,6 @@
 import { Terminal } from 'lucide-react'
 
 export default function Footer() {
-  const year = new Date().getFullYear()
-
   return (
     <footer className="relative z-10 border-t border-cyber-border">
       <div className="max-w-7xl mx-auto px-6 py-8">
@@ -23,11 +21,7 @@ export default function Footer() {
             <span className="text-neon-cyan">Doan Minh Triet</span>
           </p>
 
-          {/* Uptime */}
-          <div className="flex items-center gap-2 text-[10px] text-text-muted">
-            <span className="status-dot" />
-            <span>All systems operational</span>
-          </div>
+          <span className="text-[10px] text-text-muted">Built to document hands-on DevOps work</span>
         </div>
       </div>
     </footer>

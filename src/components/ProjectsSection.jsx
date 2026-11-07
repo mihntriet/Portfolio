@@ -1,17 +1,17 @@
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion'
 import {
   Server, Globe, Container, Shield, Database, Activity,
-  Monitor, GitBranch, Cloud, Cpu, Radio, Network,
+  Monitor, GitBranch, Cloud, Cpu, Radio,
   ChevronRight, X, Workflow, HeartPulse, Smartphone, Gamepad2, Users, Layers,
 } from 'lucide-react'
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { myProfileData } from '../data/profile'
 
 const PROJECTS = [
   {
     id: 'wedding-deployment',
     title: myProfileData.projects[0].title,
-    subtitle: 'Automated CI/CD & Serverless Deployment',
+    subtitle: 'Firebase RSVP project · case study in progress',
     accent: '#a855f7',
     description: `${myProfileData.projects[0].description} ${myProfileData.projects[0].achievements}`,
     tags: myProfileData.projects[0].techStack,
@@ -37,7 +37,7 @@ const PROJECTS = [
   {
     id: 'lab-os-network',
     title: myProfileData.projects[1].title,
-    subtitle: 'Containerization & Unix Systems',
+    subtitle: 'Linux and Docker labs · write-up in progress',
     accent: '#3b82f6',
     description: `${myProfileData.projects[1].description} ${myProfileData.projects[1].achievements}`,
     tags: myProfileData.projects[1].techStack,
@@ -61,7 +61,7 @@ const PROJECTS = [
   {
     id: 'food-delivery-app',
     title: myProfileData.projects[2].title,
-    subtitle: 'Mobile App · Frontend & API Management',
+    subtitle: 'Mobile team project · contribution notes pending',
     accent: '#10B981',
     description: `${myProfileData.projects[2].description} ${myProfileData.projects[2].achievements}`,
     tags: myProfileData.projects[2].techStack,
@@ -93,7 +93,7 @@ const PROJECTS = [
   {
     id: 'group-game',
     title: myProfileData.projects[3].title,
-    subtitle: 'Team Project · C++ Desktop Game',
+    subtitle: 'Desktop team project · contribution notes pending',
     accent: '#ff6b35',
     description: `${myProfileData.projects[3].description} ${myProfileData.projects[3].achievements}`,
     tags: myProfileData.projects[3].techStack,
@@ -122,31 +122,32 @@ const PROJECTS = [
   },
   {
     id: 'interactive-portfolio',
+    featured: true,
     title: myProfileData.projects[4].title,
-    subtitle: 'Futuristic Frontend & Cloud Hosting',
+    subtitle: 'Ansible on EC2 · Docker and Nginx',
     accent: '#00f0ff',
     description: `${myProfileData.projects[4].description} ${myProfileData.projects[4].achievements}`,
     tags: myProfileData.projects[4].techStack,
     githubRepo: myProfileData.projects[4].githubRepo,
     nodes: [
-      { id: 'dev', label: 'Local Dev (Git)', icon: GitBranch, x: 8, y: 30, active: true },
-      { id: 'github', label: 'GitHub Repository', icon: Workflow, x: 28, y: 12, active: true },
-      { id: 'docker', label: 'Docker Multi-stage', icon: Container, x: 48, y: 12, active: true },
-      { id: 'nginx', label: 'Nginx Web Server', icon: Server, x: 68, y: 12, active: true },
-      { id: 'client', label: 'Client Browser', icon: Monitor, x: 88, y: 30, active: true },
-      { id: 'emailjs', label: 'EmailJS Gateway', icon: Shield, x: 48, y: 48, active: true },
-      { id: 'mailbox', label: 'Gmail Inbox', icon: Database, x: 68, y: 48, active: true },
+      { id: 'dev', label: 'Local source', icon: GitBranch, x: 8, y: 30, active: true },
+      { id: 'ansible', label: 'WSL Ansible', icon: Workflow, x: 27, y: 12, active: true },
+      { id: 'ec2', label: 'EC2 AL2023', icon: Cloud, x: 48, y: 12, active: true },
+      { id: 'docker', label: 'Docker Engine', icon: Container, x: 68, y: 12, active: true },
+      { id: 'nginx', label: 'Nginx container', icon: Server, x: 78, y: 48, active: true },
+      { id: 'client', label: 'Browser', icon: Monitor, x: 92, y: 30, active: true },
     ],
     connections: [
-      { from: 'dev', to: 'github' },
-      { from: 'github', to: 'docker' },
+      { from: 'dev', to: 'ansible' },
+      { from: 'ansible', to: 'ec2' },
+      { from: 'ec2', to: 'docker' },
       { from: 'docker', to: 'nginx' },
       { from: 'nginx', to: 'client' },
-      { from: 'client', to: 'emailjs' },
-      { from: 'emailjs', to: 'mailbox' },
     ],
   },
 ]
+
+const DISPLAY_PROJECTS = [...PROJECTS].sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)))
 
 function PulseRing({ color, delay = 0 }) {
   return (
@@ -373,10 +374,10 @@ function ArchitectureDiagram({ project }) {
                   background: `${project.accent}10`,
                 }}
               >
-                ARCHITECTURE
+                CONCEPTUAL VIEW
               </span>
               <span className="text-[9px] text-text-muted">
-                {project.nodes.filter((n) => n.active).length}/{project.nodes.length} nodes active
+                {project.nodes.length} illustrated components · not live telemetry
               </span>
             </div>
 
@@ -400,7 +401,7 @@ function ArchitectureDiagram({ project }) {
         </div>
 
         {/* GitHub link */}
-        {project.githubRepo && (
+        {project.githubRepo ? (
           <motion.div
             className="mt-4 flex justify-end"
             initial={{ opacity: 0 }}
@@ -430,6 +431,8 @@ function ArchitectureDiagram({ project }) {
               View on GitHub →
             </a>
           </motion.div>
+        ) : (
+          <p className="mt-4 text-[11px] text-text-muted text-right">Project-specific repository link pending</p>
         )}
       </div>
     </motion.div>
@@ -503,7 +506,7 @@ function ProjectCard({ project, isExpanded, onToggle, index }) {
             </div>
 
             <div className="flex items-center gap-3 flex-shrink-0">
-              {/* Live indicator */}
+              {/* Evidence status */}
               <div className="hidden sm:flex items-center gap-1.5">
                 <span
                   className="w-1.5 h-1.5 rounded-full"
@@ -513,7 +516,7 @@ function ProjectCard({ project, isExpanded, onToggle, index }) {
                   }}
                 />
                 <span className="text-[9px] font-bold tracking-wider" style={{ color: project.accent }}>
-                  LIVE
+                  {project.githubRepo ? 'REPO LINKED' : 'WRITE-UP PENDING'}
                 </span>
               </div>
 
@@ -585,7 +588,7 @@ function ProjectCard({ project, isExpanded, onToggle, index }) {
                 )}
               </div>
               <span className="text-[10px] text-text-muted">
-                {project.nodes.length} nodes · {project.connections.length} connections
+                Conceptual diagram · {project.nodes.length} components
               </span>
               <span className="ml-auto text-[10px] font-semibold" style={{ color: project.accent }}>
                 Click to explore →
@@ -624,26 +627,21 @@ export default function ProjectsSection() {
             <div className="flex-1 h-px bg-gradient-to-r from-neon-green/30 to-transparent" />
           </div>
 
-          {/* Dashboard bar */}
+          {/* Project context */}
           <div className="flex flex-wrap items-center gap-4 text-[10px] text-text-muted mt-4">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyber-border bg-cyber-surface/50">
               <Activity className="w-3 h-3 text-neon-green" />
-              <span>Interactive Architecture</span>
+              <span>Illustrative diagrams</span>
             </div>
             <span className="hidden sm:inline text-text-muted/50">|</span>
             <span>
               Projects: <span className="text-neon-green">{PROJECTS.length}</span>
             </span>
             <span className="hidden sm:inline text-text-muted/50">|</span>
-            <span>
-              Total Nodes:{' '}
-              <span className="text-neon-cyan">
-                {PROJECTS.reduce((a, p) => a + p.nodes.length, 0)}
-              </span>
-            </span>
+            <span>Only this portfolio currently links to a specific repository.</span>
             <span className="hidden sm:inline text-text-muted/50">|</span>
             <span className="text-neon-green">
-              Click a project to explore its architecture
+              Diagrams describe intended structure; they do not report live infrastructure.
             </span>
           </div>
         </motion.div>
@@ -651,7 +649,7 @@ export default function ProjectsSection() {
         {/* Projects list */}
         <LayoutGroup>
           <div className="space-y-5">
-            {PROJECTS.map((project, i) => (
+            {DISPLAY_PROJECTS.map((project, i) => (
               <ProjectCard
                 key={project.id}
                 project={project}

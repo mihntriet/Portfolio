@@ -1,5 +1,5 @@
 # Step 1: Build stage
-FROM node:20-alpine AS build
+FROM node:24-alpine AS build
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ FROM nginx:alpine
 # Copy built static files from build stage to nginx html directory
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy custom nginx configuration to configure React Router fallback
+# Copy custom nginx configuration for SPA page reloads
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port 80 for traffic

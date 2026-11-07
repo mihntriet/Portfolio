@@ -2,6 +2,16 @@ node_modules
 npm-debug.log
 dist
 .git
-.env
+.env*
 Dockerfile
 .dockerignore
+ansible/
+.github/
+.ssh/
+.aws/
+**/.ssh/
+**/.aws/
+**/*.pem
+**/*.key
+tests/
+README.md

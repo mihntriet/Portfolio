@@ -1,0 +1,125 @@
+---
+- name: Build and run the portfolio on an EC2 Linux host
+  hosts: portfolio
+  become: true
+  gather_facts: false
+  vars:
+    app_dir: /opt/portfolio
+    source_dir: "{{ playbook_dir }}/.."
+    source_files:
+      - Dockerfile
+      - .dockerignore
+      - compose.yaml
+      - index.html
+      - nginx.conf
+      - package.json
+      - package-lock.json
+      - vite.config.js
+    source_directories:
+      - public
+      - src
+
+  tasks:
+    - name: Confirm Docker Engine is available on EC2
+      ansible.builtin.command: docker info
+      changed_when: false
+
+    - name: Check whether the deployment path already exists
+      ansible.builtin.stat:
+        path: "{{ app_dir }}"
+      register: app_path
+
+    - name: Check whether an existing path belongs to this playbook
+      ansible.builtin.stat:
+        path: "{{ app_dir }}/.portfolio-managed"
+      register: app_marker
+
+    - name: Avoid overwriting an unrelated directory
+      ansible.builtin.assert:
+        that: not app_path.stat.exists or app_marker.stat.exists
+        fail_msg: "{{ app_dir }} exists but was not created by this playbook. Choose another app_dir."
+
+    - name: Create the application directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Mark the directory as managed by this playbook
+      ansible.builtin.copy:
+        content: "Managed by ansible/deploy.yml\n"
+        dest: "{{ app_dir }}/.portfolio-managed"
+        mode: '0644'
+
+    - name: Copy individual build files from WSL to EC2
+      ansible.builtin.copy:
+        src: "{{ source_dir }}/{{ item }}"
+        dest: "{{ app_dir }}/{{ item }}"
+        mode: '0644'
+      loop: "{{ source_files }}"
+      register: copied_files
+
+    - name: Copy application source directories from WSL to EC2
+      ansible.builtin.copy:
+        src: "{{ source_dir }}/{{ item }}/"
+        dest: "{{ app_dir }}/{{ item }}/"
+        mode: 'u=rwX,g=rX,o=rX'
+        directory_mode: '0755'
+      loop: "{{ source_directories }}"
+      register: copied_directories
+
+    - name: Check whether the portfolio image exists
+      ansible.builtin.command: docker image inspect portfolio:lab
+      register: portfolio_image
+      failed_when: false
+      changed_when: false
+
+    - name: Build the image when source files change
+      ansible.builtin.command:
+        argv:
+          - docker
+          - build
+          - --tag
+          - portfolio:lab
+          - "{{ app_dir }}"
+      when: copied_files.changed or copied_directories.changed or portfolio_image.rc != 0
+
+    - name: Inspect any existing container with the target name
+      community.docker.docker_container_info:
+        name: my-portfolio-app
+      register: existing_container
+
+    - name: Avoid replacing an unrelated container
+      ansible.builtin.assert:
+        that: >-
+          not existing_container.exists or
+          (existing_container.container.Config.Labels | default({}, true)).get('com.portfolio.managed-by', '') == 'ansible'
+        fail_msg: "A container named my-portfolio-app already exists but is not managed by this playbook."
+
+    - name: Run the portfolio container
+      community.docker.docker_container:
+        name: my-portfolio-app
+        image: portfolio:lab
+        state: started
+        pull: never
+        restart_policy: unless-stopped
+        published_ports:
+          - "8080:80"
+        labels:
+          com.portfolio.managed-by: ansible
+
+    - name: Verify the app responds on the EC2 host
+      ansible.builtin.uri:
+        url: http://127.0.0.1:8080/
+        status_code: 200
+        return_content: true
+      register: homepage
+      retries: 5
+      delay: 2
+      until: homepage.status == 200
+      changed_when: false
+
+    - name: Verify the expected page was served
+      ansible.builtin.assert:
+        that: "'Doan Minh Triet' in homepage.content"
+        fail_msg: "The HTTP response did not contain the expected portfolio page."

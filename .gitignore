@@ -14,6 +14,11 @@ dist-ssr
 .env
 .env*.local
 *.local
+*.pem
+*.key
+.ssh/
+.aws/
+ansible/inventory.ini
 
 # Editor directories and files
 .vscode/*

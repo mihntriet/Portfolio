@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, test and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24.x'
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  container-smoke:
+    name: Build and smoke-test Docker image
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: docker build --tag portfolio:ci .
+      - run: docker run --detach --name portfolio-smoke --publish 127.0.0.1:8080:80 portfolio:ci
+      - name: Verify static site and SPA fallback
+        run: |
+          curl --retry 10 --retry-connrefused --retry-delay 1 --fail --silent --show-error http://127.0.0.1:8080/ | grep -q 'Doan Minh Triet'
+          curl --fail --silent --show-error http://127.0.0.1:8080/projects | grep -q 'Doan Minh Triet'

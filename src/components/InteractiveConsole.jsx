@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Terminal, ChevronRight } from 'lucide-react'
+import { Terminal } from 'lucide-react'
 import { myProfileData } from '../data/profile'
 
 /* ============================================================
@@ -10,8 +10,8 @@ const HELP_LINES = [
   { text: 'CYBER-DEVOPS TERMINAL v3.0 — HELP', color: '#00f0ff' },
   { text: '──────────────────────────────────────────────────────', color: '#00f0ff' },
   { text: '  about      → Who am I? Background & passions', color: '#10B981' },
-  { text: '  projects   → List deployed projects (sys log)', color: '#a855f7' },
-  { text: '  skills     → Display tech stack proficiency', color: '#3b82f6' },
+  { text: '  projects   → List portfolio projects', color: '#a855f7' },
+  { text: '  skills     → Practiced vs. theory-only topics', color: '#3b82f6' },
   { text: '  contact    → How to reach me', color: '#ff6b35' },
   { text: '  clear      → Clear terminal output', color: '#94a3b8' },
   { text: '  neofetch   → System information', color: '#39ff14' },
@@ -32,46 +32,36 @@ const ABOUT_LINES = [
 ]
 
 const PROJECTS_LINES = [
-  { text: '> tail -f /var/log/deployments.log', color: '#64748b' },
+  { text: '> cat ~/projects.md', color: '#64748b' },
   { text: '', color: '' },
   ...myProfileData.projects.flatMap((p, idx) => {
     const colors = ['#a855f7', '#3b82f6', '#10B981', '#ff6b35', '#00f0ff']
     const color = colors[idx % colors.length]
     return [
-      { text: `[DEPLOY] ✓ ${p.title}`, color },
+      { text: `[PROJECT] ${p.title}`, color },
       { text: `  ├── Stack: ${p.techStack.join(', ')}`, color: '#94a3b8' },
       { text: `  ├── ${p.achievements}`, color: '#39ff14' },
-      { text: `  └── Repo: ${p.githubRepo || 'private'}`, color: '#00f0ff' },
+      { text: `  └── Repo: ${p.githubRepo || 'project-specific link pending'}`, color: '#00f0ff' },
       { text: '', color: '' }
     ]
   }),
-  { text: '[INFO] All systems operational. 5 projects deployed.', color: '#39ff14' },
+  { text: `[INFO] ${myProfileData.projects.length} projects listed. This is a local UI demo, not a deployment log.`, color: '#39ff14' },
 ]
 
-const getProgressBar = (level) => {
-  const totalBlocks = 20
-  const activeBlocks = Math.round((level / 100) * totalBlocks)
-  const inactiveBlocks = totalBlocks - activeBlocks
-  return '[' + '█'.repeat(activeBlocks) + '░'.repeat(inactiveBlocks) + ']'
-}
-
 const SKILLS_LINES = [
-  { text: '> systemctl status tech-stack', color: '#64748b' },
+  { text: '> cat ~/skills.md', color: '#64748b' },
   { text: '', color: '' },
-  { text: '● tech-stack.service - Developer Skill Modules', color: '#3b82f6' },
-  { text: '   Active: active (running) since 2024-09-01', color: '#39ff14' },
+  { text: 'PRACTICED', color: '#10B981' },
+  ...myProfileData.skills.practiced.map((skill) => ({
+    text: `  ${skill.name}: ${skill.detail}`,
+    color: '#e2e8f0',
+  })),
   { text: '', color: '' },
-  ...Object.entries(myProfileData.skills).flatMap(([category, skillList]) => {
-    return skillList.map(skill => {
-      const bar = getProgressBar(skill.level)
-      const dotLength = Math.max(2, 25 - skill.name.length)
-      const dots = '.'.repeat(dotLength)
-      return {
-        text: `   ${bar} ${skill.name} ${dots} ${skill.level}%`,
-        color: '#10B981'
-      }
-    })
-  }),
+  { text: 'THEORY ONLY', color: '#a855f7' },
+  ...myProfileData.skills.learning.map((skill) => ({
+    text: `  ${skill.name}: ${skill.detail}`,
+    color: '#94a3b8',
+  })),
 ]
 
 const CONTACT_LINES = [

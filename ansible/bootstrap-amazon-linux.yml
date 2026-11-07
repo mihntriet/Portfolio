@@ -1,0 +1,28 @@
+---
+- name: Install and start Docker Engine on Amazon Linux 2023
+  hosts: portfolio
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Confirm this playbook targets Amazon Linux 2023
+      ansible.builtin.assert:
+        that:
+          - ansible_facts['distribution'] == 'Amazon'
+          - ansible_facts['distribution_major_version'] == '2023'
+        fail_msg: "This bootstrap playbook only supports Amazon Linux 2023."
+
+    - name: Install Docker Engine from the Amazon Linux repository
+      ansible.builtin.dnf:
+        name: docker
+        state: present
+
+    - name: Start Docker now and on future boots
+      ansible.builtin.systemd_service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Verify the Docker daemon responds
+      ansible.builtin.command: docker info
+      changed_when: false

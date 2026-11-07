@@ -1,30 +1,30 @@
 import { motion } from 'framer-motion'
-import { Server, Cloud, Cpu, GitBranch } from 'lucide-react'
+import { Server, Cloud, Container, GitBranch } from 'lucide-react'
 import { myProfileData } from '../data/profile'
 
 const ABOUT_CARDS = [
   {
     icon: Server,
-    title: 'Infrastructure',
-    description: 'Design and manage cloud infrastructure with IaC tools like Terraform & Pulumi.',
+    title: 'Linux & EC2',
+    description: 'Deployed this portfolio to an Amazon Linux 2023 EC2 instance and served it through Docker and Nginx.',
     color: '#00f0ff',
   },
   {
-    icon: Cloud,
-    title: 'Cloud Native',
-    description: 'Deploy containerized apps on Kubernetes across multi-cloud environments.',
+    icon: Container,
+    title: 'Docker',
+    description: 'This repository includes a multi-stage Dockerfile, a Compose setup, and an Nginx configuration you can inspect.',
     color: '#a855f7',
   },
   {
-    icon: Cpu,
-    title: 'Automation',
-    description: 'Build CI/CD pipelines that test, build, and deploy with zero human intervention.',
+    icon: GitBranch,
+    title: 'Ansible',
+    description: 'Used bootstrap and deploy playbooks from WSL to configure Docker and run this portfolio on EC2.',
     color: '#39ff14',
   },
   {
-    icon: GitBranch,
-    title: 'GitOps',
-    description: 'Version-controlled infrastructure with automated reconciliation and drift detection.',
+    icon: Cloud,
+    title: 'Learning next',
+    description: 'Terraform and Kubernetes are theory only for now. Hands-on labs will be linked when they are complete.',
     color: '#ff2d95',
   },
 ]

@@ -1,9 +1,9 @@
-import { motion, useAnimationControls, useMotionValue, useTransform } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Terminal, ChevronDown, GitBranch, Hammer, FlaskConical, Rocket, Scan } from 'lucide-react'
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { myProfileData } from '../data/profile'
 
-const TYPEWRITER_TEXT = 'DevOps Engineer'
+const TYPEWRITER_TEXT = 'DevOps Student'
 const TYPING_SPEED = 100
 const DELETE_SPEED = 60
 const PAUSE_AFTER_TYPE = 2200
@@ -231,11 +231,10 @@ function CICDPipeline() {
             <span className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
           </div>
           <span className="text-[10px] text-text-muted ml-2 tracking-wider">
-            CI/CD PIPELINE — LIVE
+            CI/CD PIPELINE — CONCEPT
           </span>
           <div className="ml-auto flex items-center gap-1.5">
-            <span className="status-dot" />
-            <span className="text-[9px] text-neon-green tracking-wider">RUNNING</span>
+            <span className="text-[9px] text-neon-green tracking-wider">ILLUSTRATION</span>
           </div>
         </div>
 
@@ -259,35 +258,16 @@ function CICDPipeline() {
           ))}
         </div>
 
-        {/* Status bar */}
+        {/* Workflow status */}
         <motion.div
           className="mt-6 pt-4 border-t border-cyber-border"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2 }}
         >
-          <div className="flex items-center justify-between text-[10px] text-text-muted">
-            <span>
-              <span className="text-neon-green">✓</span> Pipeline #1247 — All stages passed
-            </span>
-            <span>Duration: 3m 42s</span>
-          </div>
-          {/* Progress bar */}
-          <div className="mt-2 h-1 bg-cyber-border rounded-full overflow-hidden">
-            <motion.div
-              className="h-full rounded-full"
-              style={{
-                background: 'linear-gradient(to right, #10B981, #3b82f6, #a855f7, #ff6b35)',
-              }}
-              initial={{ width: '0%' }}
-              animate={{ width: '100%' }}
-              transition={{
-                duration: PIPELINE_NODES.length * 1.5 + 1.5,
-                repeat: Infinity,
-                ease: 'linear',
-              }}
-            />
-          </div>
+          <p className="text-[10px] text-text-muted">
+            CI checks are configured in this repository. EC2 deployment runs manually through Ansible. This diagram is illustrative, not live build data.
+          </p>
         </motion.div>
 
         {/* Background grid pattern inside card */}
@@ -469,7 +449,7 @@ function FuturisticAvatar() {
             transition={{ duration: 1.2, repeat: Infinity }}
           />
           <span className="text-[9px] font-bold tracking-widest" style={{ color: '#10B981' }}>
-            ID_VERIFIED
+            PORTFOLIO_PROFILE
           </span>
           <Scan className="w-3 h-3 ml-auto" style={{ color: 'rgba(0,240,255,0.5)' }} />
         </div>
