@@ -33,5 +33,12 @@ jobs:
       - run: docker run --detach --name portfolio-smoke --publish 127.0.0.1:8080:80 portfolio:ci
       - name: Verify static site and SPA fallback
         run: |
-          curl --retry 10 --retry-connrefused --retry-delay 1 --fail --silent --show-error http://127.0.0.1:8080/ | grep -q 'Doan Minh Triet'
-          curl --fail --silent --show-error http://127.0.0.1:8080/projects | grep -q 'Doan Minh Triet'
+          curl --retry 10 --retry-all-errors --retry-delay 1 --retry-max-time 30 --max-time 5 --fail --silent --show-error --output "$RUNNER_TEMP/portfolio-home.html" http://127.0.0.1:8080/
+          grep -q 'Doan Minh Triet' "$RUNNER_TEMP/portfolio-home.html"
+          curl --retry 10 --retry-all-errors --retry-delay 1 --retry-max-time 30 --max-time 5 --fail --silent --show-error --output "$RUNNER_TEMP/portfolio-projects.html" http://127.0.0.1:8080/projects
+          grep -q 'Doan Minh Triet' "$RUNNER_TEMP/portfolio-projects.html"
+      - name: Show container diagnostics on failure
+        if: failure()
+        run: |
+          docker ps -a --filter name=portfolio-smoke
+          docker logs portfolio-smoke
