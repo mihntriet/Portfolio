@@ -44,4 +44,4 @@ The first two runs succeeded but warned that `community.docker` 5.4.0 does not s
 
 ## Current limits
 
-The image is built on EC2 from the local workspace, including uncommitted changes. The first GitHub Actions run passed lint, test, build, and Docker build, but its HTTP smoke check failed on a connection reset immediately after starting the container. The workflow now retries that transient error; its next hosted result remains to be verified. The endpoint uses HTTP on port 8080. Versioned image releases, automated delivery, HTTPS, and monitoring remain future work.
+The image is built on EC2 from the local workspace, including uncommitted changes. The first GitHub Actions run passed lint, test, build, and Docker build, but its HTTP smoke check failed on a connection reset just after starting the container. The workflow now retries that transient error, and the [next hosted run on `main`](https://github.com/mihntriet/Portfolio/actions/runs/42351969216) passed both jobs. The endpoint uses HTTP on port 8080. Versioned image releases, automated delivery, HTTPS, and monitoring remain future work.

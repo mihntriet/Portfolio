@@ -266,7 +266,7 @@ function CICDPipeline() {
           transition={{ delay: 2 }}
         >
           <p className="text-[10px] text-text-muted">
-            CI checks are configured in this repository. EC2 deployment runs manually through Ansible. This diagram is illustrative, not live build data.
+            GitHub Actions checks lint, test, build, and container HTTP. EC2 deployment runs manually through Ansible. This diagram is illustrative, not live build data.
           </p>
         </motion.div>
 
