@@ -48,7 +48,7 @@ export const myProfileData = {
             title: "Interactive DevOps Portfolio",
             description: "A React portfolio deployed to Amazon Linux 2023 on EC2 using Ansible, Docker, and Nginx.",
             techStack: ["Ansible", "AWS EC2", "Docker", "Nginx", "GitHub Actions", "React", "Vite"],
-            achievements: "The Ansible playbooks install Docker, build the image on EC2, run the Nginx container, and verify HTTP. Two consecutive deployment runs reported changed=6 then changed=0, with no failures. GitHub Actions checks the app and Docker image; EC2 delivery remains manual.",
+            achievements: "The Ansible playbooks install Docker, build the image on EC2, run the Nginx container, and verify HTTP. Two consecutive deployment runs reported changed=6 then changed=0, with no failures. GitHub Actions CI passed lint, test, build, and Docker HTTP smoke on main; EC2 delivery remains manual.",
             githubRepo: "https://github.com/mihntriet/Portfolio",
         }
     ],
