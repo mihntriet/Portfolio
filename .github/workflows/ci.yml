@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - run: docker build --tag portfolio:ci .
+      - run: docker build --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" --label "org.opencontainers.image.revision=$GITHUB_SHA" --tag portfolio:ci .
       - run: docker run --detach --name portfolio-smoke --publish 127.0.0.1:8080:80 portfolio:ci
       - name: Verify static site and SPA fallback
         run: |
@@ -42,3 +42,48 @@ jobs:
         run: |
           docker ps -a --filter name=portfolio-smoke
           docker logs portfolio-smoke
+      - name: Save the verified image for publication
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: docker save --output "$RUNNER_TEMP/portfolio-image.tar" portfolio:ci
+      - name: Transfer the verified image to the publish job
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v6
+        with:
+          name: portfolio-verified-image
+          path: ${{ runner.temp }}/portfolio-image.tar
+          if-no-files-found: error
+          retention-days: 7
+
+  publish-image:
+    name: Publish verified image to GHCR
+    needs: [quality, container-smoke]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Download the image that passed the smoke test
+        uses: actions/download-artifact@v6
+        with:
+          name: portfolio-verified-image
+          path: ${{ runner.temp }}
+      - name: Load the verified image
+        run: docker load --input "$RUNNER_TEMP/portfolio-image.tar"
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Tag and publish the verified image
+        shell: bash
+        run: |
+          set -euo pipefail
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          tag="sha-${GITHUB_SHA}"
+          docker tag portfolio:ci "${image}:${tag}"
+          docker push "${image}:${tag}" | tee "$RUNNER_TEMP/portfolio-push.log"
+          digest="$(sed -nE 's/^.*digest: (sha256:[0-9a-f]{64}).*$/\1/p' "$RUNNER_TEMP/portfolio-push.log" | tail -n 1)"
+          test -n "$digest"
+          printf '### Verified container image\n\n`%s@%s`\n\nCommit: `%s`\n' "$image" "$digest" "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"

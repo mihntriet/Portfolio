@@ -1,0 +1,150 @@
+---
+- name: Deploy a verified GHCR image to EC2
+  hosts: portfolio
+  become: true
+  gather_facts: false
+  vars:
+    ghcr_user: "{{ lookup('env', 'GHCR_USER') }}"
+    ghcr_token: "{{ lookup('env', 'GHCR_TOKEN') }}"
+
+  tasks:
+    - name: Require the immutable image reference from this repository
+      ansible.builtin.assert:
+        that:
+          - image_ref is defined
+          - image_ref | default('') is match('^ghcr[.]io/mihntriet/portfolio@sha256:[0-9a-f]{64}$')
+          - (ghcr_user | length == 0) == (ghcr_token | length == 0)
+        fail_msg: >-
+          Pass image_ref=ghcr.io/mihntriet/portfolio@sha256:<64 hex characters>.
+          For a private package, set both GHCR_USER and GHCR_TOKEN in WSL.
+
+    - name: Confirm Docker Engine is available on EC2
+      ansible.builtin.command: docker info
+      changed_when: false
+
+    - name: Confirm the published image matches the EC2 CPU architecture
+      ansible.builtin.command: uname -m
+      register: host_architecture
+      changed_when: false
+
+    - name: Require an x86-64 host for the current GitHub runner build
+      ansible.builtin.assert:
+        that: host_architecture.stdout == 'x86_64'
+        fail_msg: "The current publish job builds linux/amd64 only. This EC2 host is {{ host_architecture.stdout }}."
+
+    - name: Inspect any existing container with the target name
+      community.docker.docker_container_info:
+        name: my-portfolio-app
+      register: existing_container
+
+    - name: Avoid replacing an unrelated container
+      ansible.builtin.assert:
+        that: >-
+          not existing_container.exists or
+          (existing_container.container.Config.Labels | default({}, true)).get('com.portfolio.managed-by', '') == 'ansible'
+        fail_msg: "A container named my-portfolio-app already exists but is not managed by Ansible."
+
+    - name: Check whether the requested image is already on EC2
+      ansible.builtin.command:
+        argv:
+          - docker
+          - image
+          - inspect
+          - "{{ image_ref }}"
+      register: requested_image
+      failed_when: false
+      changed_when: false
+
+    - name: Pull the requested image when it is missing
+      when: requested_image.rc != 0
+      block:
+        - name: Create a temporary Docker credentials directory
+          ansible.builtin.tempfile:
+            state: directory
+            prefix: portfolio-ghcr-
+          register: docker_config
+
+        - name: Log in to GHCR for a private package
+          ansible.builtin.command:
+            argv:
+              - docker
+              - --config
+              - "{{ docker_config.path }}"
+              - login
+              - ghcr.io
+              - --username
+              - "{{ ghcr_user }}"
+              - --password-stdin
+            stdin: "{{ ghcr_token }}"
+          no_log: true
+          when: ghcr_token | length > 0
+
+        - name: Pull the verified image by digest
+          ansible.builtin.command:
+            argv:
+              - docker
+              - --config
+              - "{{ docker_config.path }}"
+              - pull
+              - "{{ image_ref }}"
+          changed_when: true
+      always:
+        - name: Remove temporary Docker credentials
+          ansible.builtin.file:
+            path: "{{ docker_config.path }}"
+            state: absent
+          when: docker_config.path is defined
+
+    - name: Switch container and verify the site
+      block:
+        - name: Run the verified image
+          community.docker.docker_container:
+            name: my-portfolio-app
+            image: "{{ image_ref }}"
+            state: started
+            pull: never
+            restart_policy: unless-stopped
+            published_ports:
+              - "8080:80"
+            labels:
+              com.portfolio.managed-by: ansible
+
+        - name: Verify the site responds on EC2
+          ansible.builtin.uri:
+            url: http://127.0.0.1:8080/
+            status_code: 200
+            return_content: true
+          register: homepage
+          retries: 8
+          delay: 2
+          until: homepage.status == 200
+          changed_when: false
+
+        - name: Verify the expected page was served
+          ansible.builtin.assert:
+            that: "'Doan Minh Triet' in homepage.content"
+            fail_msg: "The HTTP response did not contain the expected portfolio page."
+
+      rescue:
+        - name: Restore the previous container image when available
+          community.docker.docker_container:
+            name: my-portfolio-app
+            image: "{{ existing_container.container.Config.Image }}"
+            state: started
+            pull: never
+            restart_policy: unless-stopped
+            published_ports:
+              - "8080:80"
+            labels:
+              com.portfolio.managed-by: ansible
+          when: existing_container.exists
+
+        - name: Remove the failed first deployment
+          community.docker.docker_container:
+            name: my-portfolio-app
+            state: absent
+          when: not existing_container.exists
+
+        - name: Report the failed deployment after recovery
+          ansible.builtin.fail:
+            msg: "The requested image failed deployment checks. Restoration of the previous image was attempted when available."

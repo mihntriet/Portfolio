@@ -8,7 +8,7 @@ This portfolio documents my current DevOps learning path and projects. I deploye
 
 - Hands-on foundation: Linux, Docker, Ansible, and AWS EC2. The Ansible playbooks and a reproducible EC2 walkthrough are in this repository.
 - Theory only: Terraform and Kubernetes. They are not presented as production experience.
-- GitHub Actions CI runs lint, test, build, and Docker smoke checks on pushes to `main` and pull requests. The [first successful hosted run](https://github.com/mihntriet/Portfolio/actions/runs/42351969216) passed both jobs. EC2 deployment is manual through Ansible.
+- GitHub Actions CI runs lint, test, build, and Docker smoke checks on pushes to `main` and pull requests. The [first successful hosted run](https://github.com/mihntriet/Portfolio/actions/runs/42351969216) passed both jobs. The workflow now includes a GHCR publish job for verified commits on `main`; EC2 deployment remains a manual Ansible step.
 - Pipeline animations, terminal output, and project architecture diagrams on the site are illustrative, not live monitoring data.
 - Only this portfolio currently has a project-specific repository link in the site. Links for other projects will be added when verified.
 
@@ -54,7 +54,7 @@ npm test
 npm run build
 ```
 
-The GitHub Actions workflow runs these checks on pull requests and pushes to `main`, then builds the Docker image and tests that Nginx serves the homepage and SPA fallback. The first hosted smoke test encountered a connection reset just after starting the container. The retry and diagnostic update passed in the [next run on `main`](https://github.com/mihntriet/Portfolio/actions/runs/42351969216). The workflow does not publish an image or deploy to a server yet.
+The GitHub Actions workflow runs these checks on pull requests and pushes to `main`, then builds the Docker image and tests that Nginx serves the homepage and SPA fallback. The first hosted smoke test encountered a connection reset just after starting the container. The retry and diagnostic update passed in the [next run on `main`](https://github.com/mihntriet/Portfolio/actions/runs/42351969216). After both jobs pass on `main`, the new publish job transfers that tested image to GHCR with a commit tag and records its immutable digest in the workflow summary. Publishing and deployment from that digest still need to be verified on a hosted run.
 
 ### 4. Optional contact form configuration
 
@@ -78,6 +78,8 @@ ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
 ```
 
 The deployment was run twice: the first run reported `changed=6`, and the second reported `changed=0`, with no failed or unreachable hosts. After pinning a compatible `community.docker` version and updating the site, another unchanged run also reported `changed=0` without warnings. The playbook's HTTP check passed. This is an HTTP lab endpoint; HTTPS and automated delivery are future phases.
+
+The next release path is documented in the [GHCR promotion guide](ansible/README.md#5-publish-and-promote-a-verified-image). It uses `ansible/deploy-image.yml` to pull a published image by digest, switch the container, check HTTP, and restore the previous image if that check fails. The existing `ansible/deploy.yml` still builds local workspace files; running it after a digest deployment intentionally switches the site back to a local build.
 
 ---
 

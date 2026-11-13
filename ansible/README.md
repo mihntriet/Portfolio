@@ -120,6 +120,28 @@ ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
 
 The deployment playbook checks Docker, copies only the build inputs from your current workspace to `/opt/portfolio` on EC2, builds an image, starts a container, and checks `http://127.0.0.1:8080/` from the instance. It refuses to overwrite an existing `/opt/portfolio` directory or an existing `my-portfolio-app` container unless they were created by this playbook.
 
-Run the deployment playbook a second time and compare `changed=` in the recap. The recorded second run had `changed=0`; the build was skipped and the container task remained `ok`. The current workflow builds on EC2 and deploys local workspace files, including any uncommitted changes. A later CI/CD phase will publish a versioned image from a reviewed commit.
+Run the deployment playbook a second time and compare `changed=` in the recap. The recorded second run had `changed=0`; the build was skipped and the container task remained `ok`. This playbook builds on EC2 and deploys local workspace files, including any uncommitted changes. Section 5 describes how to deploy a verified image from a commit instead.
 
 If the playbook passes and the EC2 security group permits port 8080, open `http://EC2_PUBLIC_DNS_OR_IP:8080/` in your browser. This is an HTTP lab endpoint, not a production HTTPS setup. Docker builds can use considerable memory and network bandwidth on small EC2 instances.
+
+## 5. Publish and promote a verified image
+
+The `publish-image` GitHub Actions job runs only after both CI jobs succeed on a push to `main`. It loads the exact image that passed the container smoke test, tags it `sha-<commit SHA>`, pushes it to GHCR, and writes the image's **digest** to the run summary. A digest identifies the exact image; a tag can be moved by a later build. The job uses the workflow's `GITHUB_TOKEN`, so you do not need to add a publishing secret.
+
+After you push this workflow to `main`, open **GitHub → Actions → CI → newest run**. Confirm all three jobs are green. Copy the full `ghcr.io/mihntriet/portfolio@sha256:...` value from **Verified container image** in the run summary. The image build currently targets `linux/amd64`; `ansible/deploy-image.yml` stops before deployment if the EC2 CPU is not `x86_64`.
+
+GHCR creates new packages as **private** by default. To keep the image private, create a GitHub personal access token (classic) with `read:packages` for your own account. In WSL, enter it without putting it in shell history:
+
+```bash
+read -r -s -p 'GHCR read token: ' GHCR_TOKEN
+echo
+export GHCR_USER=mihntriet GHCR_TOKEN
+ansible-playbook -i ansible/inventory.ini ansible/deploy-image.yml -e 'image_ref=ghcr.io/mihntriet/portfolio@sha256:REPLACE_WITH_DIGEST'
+unset GHCR_TOKEN GHCR_USER
+```
+
+Replace `REPLACE_WITH_DIGEST` with the **64 hexadecimal characters** after `sha256:`. Never paste the token into chat, Git, the inventory file, or `-e` on the command line. The playbook sends it over the existing Ansible SSH connection, uses a temporary root-owned Docker config for the pull, and removes that config afterward. If you have intentionally made the GHCR package public, omit the `read` and `export` lines; anonymous pulls work for public container packages. Changing a private package to public is a separate, lasting visibility decision.
+
+The playbook checks that the existing container is Ansible-managed, pulls the selected image only when missing, starts it on port 8080, and checks the homepage. If the switch or HTTP check fails, it attempts to restore the previous container image and reports a failed deployment. The old `ansible/deploy.yml` deploys your local workspace; use `deploy-image.yml` for repeatable releases from CI.
+
+Run the same `deploy-image.yml` command a second time with the same digest. Expect no image pull and `changed=0`. Record both recaps and the successful public browser check in the case study only after observing them.
