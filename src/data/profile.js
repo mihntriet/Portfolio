@@ -11,7 +11,7 @@ export const myProfileData = {
         githubAlt: "https://github.com/dmtriet11",
         linkedin: "https://linkedin.com/in/lio56",
         email: "doanminhtriet0506@gmail.com",
-        tagline: "I deployed this portfolio to an Amazon Linux 2023 EC2 instance with Ansible and Docker. I am building CI experience and learning Terraform and Kubernetes step by step.",
+        tagline: "GitHub Actions tests and publishes this portfolio image to GHCR. I deploy it to Amazon Linux 2023 on EC2 by digest with Ansible. Terraform and Kubernetes are still theory only.",
     },
 
     // 2. Real Projects (displayed in the Interactive Architecture Diagram)
@@ -47,8 +47,8 @@ export const myProfileData = {
         {
             title: "Interactive DevOps Portfolio",
             description: "A React portfolio deployed to Amazon Linux 2023 on EC2 using Ansible, Docker, and Nginx.",
-            techStack: ["Ansible", "AWS EC2", "Docker", "Nginx", "GitHub Actions", "React", "Vite"],
-            achievements: "The Ansible playbooks install Docker, build the image on EC2, run the Nginx container, and verify HTTP. Two consecutive deployment runs reported changed=6 then changed=0, with no failures. GitHub Actions CI passed lint, test, build, and Docker HTTP smoke on main; EC2 delivery remains manual.",
+            techStack: ["Ansible", "AWS EC2", "Docker", "Nginx", "GitHub Actions", "GHCR", "React", "Vite"],
+            achievements: "GitHub Actions passed lint, test, build, and Docker HTTP smoke checks, then published the tested image to GHCR. I deployed that image to EC2 by digest with Ansible and verified HTTP. The first release run changed 4 tasks; the repeat run changed 0. Deployment is manually triggered.",
             githubRepo: "https://github.com/mihntriet/Portfolio",
         }
     ],
@@ -57,9 +57,10 @@ export const myProfileData = {
     skills: {
         practiced: [
             { name: "Linux", detail: "Hands-on foundation; public lab notes pending." },
-            { name: "Docker", detail: "Multi-stage build and Compose in this repository.", href: "https://github.com/mihntriet/Portfolio" },
-            { name: "Ansible", detail: "Used bootstrap and deploy playbooks for this EC2 deployment." },
-            { name: "AWS EC2", detail: "Deployed this portfolio on Amazon Linux 2023." }
+            { name: "Docker", detail: "Multi-stage build, Compose, and GHCR image release in this repository.", href: "https://github.com/mihntriet/Portfolio" },
+            { name: "Ansible", detail: "Used bootstrap and digest deployment playbooks on EC2; repeat run changed 0 tasks." },
+            { name: "AWS EC2", detail: "Deployed this portfolio on Amazon Linux 2023." },
+            { name: "GitHub Actions", detail: "CI and GHCR publication passed on main.", href: "https://github.com/mihntriet/Portfolio/actions/runs/43422450291" }
         ],
         learning: [
             { name: "Terraform", detail: "Theory only; first AWS lab planned." },
@@ -69,7 +70,7 @@ export const myProfileData = {
 
     // 4. Terminal simulator command responses
     terminalCommands: {
-        about: "Hello! I'm Doan Minh Triet, a 2nd-year IT student at HCMUS. I deployed this portfolio to EC2 with Ansible and Docker. Terraform and Kubernetes are currently theory only.",
+        about: "Hello! I'm Doan Minh Triet, a 2nd-year IT student at HCMUS. GitHub Actions publishes my tested portfolio image to GHCR, and I deploy it to EC2 by digest with Ansible. Terraform and Kubernetes are currently theory only.",
         contact: "You can reach me via Email: doanminhtriet0506@gmail.com or GitHub: https://github.com/mihntriet"
     }
 };

@@ -128,9 +128,15 @@ If the playbook passes and the EC2 security group permits port 8080, open `http:
 
 The `publish-image` GitHub Actions job runs only after both CI jobs succeed on a push to `main`. It loads the exact image that passed the container smoke test, tags it `sha-<commit SHA>`, pushes it to GHCR, and writes the image's **digest** to the run summary. A digest identifies the exact image; a tag can be moved by a later build. The job uses the workflow's `GITHUB_TOKEN`, so you do not need to add a publishing secret.
 
-After you push this workflow to `main`, open **GitHub → Actions → CI → newest run**. Confirm all three jobs are green. Copy the full `ghcr.io/mihntriet/portfolio@sha256:...` value from **Verified container image** in the run summary. The image build currently targets `linux/amd64`; `ansible/deploy-image.yml` stops before deployment if the EC2 CPU is not `x86_64`.
+For each release, open **GitHub → Actions → CI → newest run**. Confirm all three jobs are green. Copy the full `ghcr.io/mihntriet/portfolio@sha256:...` value from **Verified container image** in the run summary. The image build currently targets `linux/amd64`; `ansible/deploy-image.yml` stops before deployment if the EC2 CPU is not `x86_64`.
 
-GHCR creates new packages as **private** by default. To keep the image private, create a GitHub personal access token (classic) with `read:packages` for your own account. In WSL, enter it without putting it in shell history:
+The recorded image for this project was accessible to an anonymous registry request, so it was deployed from WSL without a token:
+
+```bash
+ansible-playbook -i ansible/inventory.ini ansible/deploy-image.yml -e 'image_ref=ghcr.io/mihntriet/portfolio@sha256:REPLACE_WITH_DIGEST'
+```
+
+If the package is private for a future release, create a GitHub personal access token (classic) with `read:packages` for your own account. In WSL, enter it without putting it in shell history:
 
 ```bash
 read -r -s -p 'GHCR read token: ' GHCR_TOKEN
@@ -140,8 +146,8 @@ ansible-playbook -i ansible/inventory.ini ansible/deploy-image.yml -e 'image_ref
 unset GHCR_TOKEN GHCR_USER
 ```
 
-Replace `REPLACE_WITH_DIGEST` with the **64 hexadecimal characters** after `sha256:`. Never paste the token into chat, Git, the inventory file, or `-e` on the command line. The playbook sends it over the existing Ansible SSH connection, uses a temporary root-owned Docker config for the pull, and removes that config afterward. If you have intentionally made the GHCR package public, omit the `read` and `export` lines; anonymous pulls work for public container packages. Changing a private package to public is a separate, lasting visibility decision.
+Replace `REPLACE_WITH_DIGEST` with the **64 hexadecimal characters** after `sha256:`. Never paste a token into chat, Git, the inventory file, or `-e` on the command line. When a token is supplied, the playbook sends it over the existing Ansible SSH connection, uses a temporary root-owned Docker config for the pull, and removes that config afterward. GHCR creates new packages as private by default; check each package's current visibility rather than assuming that every release is public.
 
 The playbook checks that the existing container is Ansible-managed, pulls the selected image only when missing, starts it on port 8080, and checks the homepage. If the switch or HTTP check fails, it attempts to restore the previous container image and reports a failed deployment. The old `ansible/deploy.yml` deploys your local workspace; use `deploy-image.yml` for repeatable releases from CI.
 
-Run the same `deploy-image.yml` command a second time with the same digest. Expect no image pull and `changed=0`. Record both recaps and the successful public browser check in the case study only after observing them.
+Run the same `deploy-image.yml` command a second time with the same digest to check idempotence. For the [recorded release](CASE_STUDY.md#verified-image-promotion), the first run reported `changed=4` and the second `changed=0`, with no failed tasks. The public HTTP check also returned 200.

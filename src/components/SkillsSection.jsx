@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { BookOpen, Container, Server, Terminal } from 'lucide-react'
+import { BookOpen, Container, Server, Terminal, Workflow } from 'lucide-react'
 import { myProfileData } from '../data/profile'
 
 const PRACTICED_ICONS = {
@@ -7,6 +7,7 @@ const PRACTICED_ICONS = {
   Docker: Container,
   Ansible: Server,
   'AWS EC2': Server,
+  'GitHub Actions': Workflow,
 }
 
 function SkillCard({ skill, icon: Icon, accent, status }) {
@@ -24,7 +25,7 @@ function SkillCard({ skill, icon: Icon, accent, status }) {
       <p className="text-xs text-text-secondary leading-relaxed">{skill.detail}</p>
       {skill.href && (
         <a href={skill.href} target="_blank" rel="noopener noreferrer" className="text-xs text-neon-cyan hover:underline">
-          Inspect repository →
+          View evidence →
         </a>
       )}
     </div>
@@ -55,7 +56,7 @@ export default function SkillsSection() {
         </motion.div>
 
         <h3 className="text-xs font-bold uppercase tracking-widest text-neon-green mb-4">Hands-on foundation</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-10">
           {myProfileData.skills.practiced.map((skill) => (
             <SkillCard key={skill.name} skill={skill} icon={PRACTICED_ICONS[skill.name]} accent="#10B981" status="Practiced" />
           ))}
